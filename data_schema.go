@@ -2,30 +2,50 @@ package main
 
 import (
 	// "fmt"
+
+	"fmt"
 	"log"
-	"gopkg.in/mgo.v2"
+	"reflect"
+	"strconv"
+	"strings"
+	"time"
+
+	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
-type Model struct {
-}
+var (
+	con_ip      = "127.0.0.1"
+	con_db      = "test"
+	table_count = 0
+)
+
+const (
+	con_layout = "Mon Jan _2 15:04:05 2006"
+)
+
+// type Model struct {
+// }
 
 /*==========Person Management=================*/
 type Person struct {
 	/*
 		student/ teacher/ assistant
 	*/
-	Name                    string   //[uniqle]
-	Phone_Home              string   // Nil
-	Phone_Cell              string   //Nil
-	EMAIL                   string   // Nil
-	Identity                string   // student/ teacher/ assistant
-	Classes                 []string //[A,B..] or nil
-	Salary_HR               int      //[same as Salary table] for Teacher and Assistant only
-	Student_Parents_Contect string
-	Note                    string
-	UpdateTime              string // Array timestamp
-	Delete_Record           bool   // 1 = delete but is not in the trash
+	Uid                     int    `json: "uid" bson:"uid"`
+	Name                    string `json: "Name" bson:"Name"`             //[uniqle]
+	Phone_Home              string `json: "phone_home" bson:"phone_home"` // Nil
+	Phone_Cell              string `json: "phone_cell" bson:"phone_cell"` //Nil
+	EMAIL                   string `json: "email" bson:"email"`           // Nil
+	Identity                string `json: "identity" bson:"identity"`     // student/ teacher/ assistant
+	Open_Date               string `json: "open_date" bson:"open_date"`
+	Classes                 string `json: "classess" bson:"classess"`   //[A,B..] or nil
+	Salary_HR_Int           int    `json: "salary_hr" bson:"salary_hr"` //[same as Salary table] for Teacher and Assistant only
+	Salary_HR               string `json: "salary_hr" bson:"salary_hr"`
+	Student_Parents_Contect string `json: "student_parents_contect" bson:"student_parents_contect"`
+	Note                    string `json: "note" bson:"note"`
+	UpdateTime              string `json: "updatetime" bson:"updatetime"`         // Array timestamp
+	Delete_Record           bool   `json: "uidelete_record" bson:"delete_record"` // 1 = delete but is not in the trash
 }
 
 // {
@@ -43,19 +63,20 @@ type Person struct {
 
 /*==========Class Management=================*/
 type Class struct {
-	Class        string //[uniqle] Name of class ex: English A, English B
-	Date         string // Fixed date ex: friday
-	Time_HR      string // Fixed time ex: 1430 -> 14:30
-	Duration_HR  string // Fixed duration ex: 2.5 -> 2.5 hours
-	Open_Date    string // when is this class's first day ?
-	Teacher      string // Name of a teacher
-	Num_Students int    // number of students
-	Course_Type  string // ex: math or english
+	Cid          int    `json: "cid" bson:"cid"`
+	Class        string `json: "class" bson:"class"`               //[uniqle] Name of class ex: English A, English B
+	Day          string `json: "day" bson:"day"`                   // Fixed day ex: friday
+	Time_HR      string `json: "time_hr" bson:"time_hr"`           // Fixed time ex: 1430 -> 14:30
+	Duration_HR  string `json: "duration_hr" bson:"duration_hr"`   // Fixed duration ex: 2.5 -> 2.5 hours
+	Open_Date    string `json: "open_date" bson:"open_date"`       // when is this class's first day ?
+	Teacher      string `json: "teacher" bson:"teacher"`           // Name of a teacher
+	Num_Students int    `json: "num_students" bson:"num_students"` // number of students
+	Course_Type  string `json: "course_type" bson:"course_type"`   // ex: math or english
 	//student
-	Students      []string // Name of students: [..,..]
-	Pay_Student   int      // cost of a class each student
-	UpdateTime    string   // Array timestamp
-	Delete_Record bool     // 1 = delete but is not in the trash
+	Students          []string `json: "students" bson:"students"`                   // Name of students: [..,..]
+	Cost_Each_Student int      `json: "cost_each_student" bson:"cost_each_student"` // cost of a class each student
+	UpdateTime        string   `json: "updatetime" bson:"updatetime"`               // Array timestamp
+	Delete_Record     bool     `json: "delete_record" bson:"delete_record"`         // 1 = delete but is not in the trash
 
 }
 
@@ -64,6 +85,7 @@ type Student_Payment struct {
 	/*
 		A Student : Class -> 1 : N
 	*/
+	SCid             int    `json: "scid" bson:"scid"`
 	Student_Class    string // for unique key: student name + class name
 	Student          string
 	Class            string
@@ -78,6 +100,7 @@ type Student_Payment struct {
 }
 
 type Assistant_Salary struct {
+	ASid            int `json: "asid" bson:"asid"`
 	Assistant       string
 	HR_Work_No_Gain int //How long (work Hours)  hasn't gaiven to the assistant.
 	HR_Work_Total   int
@@ -91,6 +114,7 @@ type Teacher_Salary struct {
 	/*
 		A Teacher : Class -> 1 : N
 	*/
+	TCid            int    `json: "tcid" bson:"tcid"`
 	Teacher_Class   string // for unique key
 	Teacher         string
 	Class           string
@@ -110,9 +134,10 @@ type Teacher_Salary struct {
 /*==========Time Management=================*/
 type Person_Class struct {
 	/*
-		One day a Teacher or a Student : Class -> 1 : N
+		attend record
+			One day a Teacher or a Student : Class -> 1 : N
 	*/
-
+	PCid          int    `json: "pcid" bson:"pcid"`
 	Identity      string //student or teacher
 	Name          string
 	Class         string
@@ -128,6 +153,8 @@ type Person_Class struct {
 
 }
 type Assistant_Date struct {
+	// work record
+	ADid             int `json: "adid" bson:"adid"`
 	Assistant        string
 	Date_Attend      string
 	Punch_Start_Time string //recently check in to work
@@ -137,6 +164,7 @@ type Assistant_Date struct {
 }
 
 type Histry_Payment struct {
+	HPid          int    `json: "hpid" bson:"hpid"`
 	Identity      string //student or teacher
 	Person        string //name
 	InOut         bool   // student = in = 1 , teacher, assistant = out = 0
@@ -320,18 +348,8 @@ c := session.DB("test").C("assistant_date")
 
 		p.UpdateTime  = time.Now().Format(layout)
 */
-func Data_connect_mgo(serverIP string, db string, collection string) {
-	session, err := mgo.Dial(serverIP)
-	if err != nil {
-		panic(err)
-	}
-	defer session.Close()
-	session.SetMode(mgo.Monotonic, true)
-	c := session.DB(db).C(collection)
-	return c
-}
 
-func Data_set_index(arr_keys []string, Unique, DropDups, Background, Sparse bool) {
+func Data_set_index(c *mgo.Collection, arr_keys []string, Unique, DropDups, Background, Sparse bool) error {
 	index := mgo.Index{
 		// Key:        []string{"teacher_class"},
 		Key:        arr_keys,
@@ -340,90 +358,307 @@ func Data_set_index(arr_keys []string, Unique, DropDups, Background, Sparse bool
 		Background: Background,
 		Sparse:     Sparse,
 	}
-	err = c.EnsureIndex(index)
+	err := c.EnsureIndex(index)
 	if err != nil {
-		panic(err)
+		log.Fatal("Data_set_index: " + err.Error())
+		//panic(err)
 	}
 	return err
 }
 
-func Data_find_student_data() {
-	return
+func Data_connect_mgo(serverIP string, db string, collection string) (*mgo.Collection, *mgo.Session) {
+	session, err := mgo.Dial(serverIP)
+	if err != nil {
+		log.Fatal("Data_connect_mgo: " + err.Error())
+		//panic(err)
+	}
+
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB(db).C(collection)
+	return c, session
 }
 
-// func Data_new_schema(schema struct){
-// 	s := new(schema)
-// 	return s
+func Data_find_person(c *mgo.Collection, M bson.M) []Person {
+	person := []Person{}
+	//err := c.Find(M).One(&result)
+	err := c.Find(M).All(&person)
+	if err != nil {
+		log.Fatal("Data_find_person: " + err.Error())
+	}
+	table_count = len(person)
+	return person
+}
+
+func Data_find_class(c *mgo.Collection, M bson.M) []Class {
+	class_s := []Class{}
+	err := c.Find(M).All(&class_s)
+	if err != nil {
+		log.Fatal("Data_find_class: " + err.Error())
+	}
+	table_count = len(class_s)
+	return class_s
+}
+
+func Data_remove_Person(s []Person, identity string) string {
+	//p := Person{}
+	fmt.Println("===dmp")
+	fmt.Println(s)
+
+	c, session := Data_connect_mgo(con_ip, con_db, "people")
+	defer session.Close()
+
+	for _, ss := range s {
+		fmt.Println(&ss.Name)
+		fmt.Println(ss.Name)
+		fmt.Println("identity")
+		fmt.Println(identity)
+		//suport to remove multiple records
+		colQuerier := bson.M{
+			strings.ToLower("Name"): ss.Name,
+		}
+		update_field := bson.M{
+			strings.ToLower("Identity"):      identity,
+			strings.ToLower("UpdateTime"):    time.Now().Format(con_layout),
+			strings.ToLower("Delete_Record"): true,
+		}
+		change := bson.M{"$set": update_field}
+		fmt.Println(colQuerier)
+		fmt.Println(update_field)
+		fmt.Println(change)
+		err := c.Update(colQuerier, change)
+		if err != nil {
+			fmt.Println(err.Error())
+			log.Fatal("Data_remove_Person: " + err.Error())
+		}
+
+	}
+
+	return "success"
+}
+
+func Data_update_Person(s Person, identity string) string {
+	//p := Person{}
+	salary_int := 0
+	c, session := Data_connect_mgo(con_ip, con_db, "people")
+	defer session.Close()
+	if s.Salary_HR != "" {
+		sa, err_conv := strconv.Atoi(s.Salary_HR)
+		if err_conv != nil {
+			sa = 0
+			//log.Fatal("Data_find_Person_One: err_conv" + err.Error())
+		}
+		salary_int = sa
+	}
+	// Update
+	colQuerier := bson.M{
+		strings.ToLower("Name"): s.Name,
+	}
+	update_field := bson.M{
+		//"Uid": index_last,
+		//Name:                    s.Name,
+		strings.ToLower("Phone_Home"):              s.Phone_Home,
+		strings.ToLower("Phone_Cell"):              s.Phone_Cell,
+		strings.ToLower("EMAIL"):                   s.EMAIL,
+		strings.ToLower("Identity"):                identity,
+		strings.ToLower("Open_Date"):               s.Open_Date,
+		strings.ToLower("Classes"):                 s.Classes,
+		strings.ToLower("Salary_HR"):               s.Salary_HR,
+		strings.ToLower("Salary_HR_Int"):           salary_int,
+		strings.ToLower("Student_Parents_Contect"): s.Student_Parents_Contect,
+		strings.ToLower("Note"):                    s.Note,
+		strings.ToLower("UpdateTime"):              time.Now().Format(con_layout),
+		strings.ToLower("Delete_Record"):           false,
+	}
+	change := bson.M{"$set": update_field}
+	fmt.Println(colQuerier)
+	fmt.Println(update_field)
+	fmt.Println(change)
+	err := c.Update(colQuerier, change)
+	if err != nil {
+		fmt.Println(err.Error())
+		return ("Warning: System Error. DUP")
+		//log.Fatal("Data_update_Person: " + err.Error())
+	}
+	return "success"
+}
+func Data_insert_Person(s Person, identity string) string {
+	salary_int := 0
+	fmt.Println(s.Name)
+	p := Person{}
+	c, session := Data_connect_mgo(con_ip, con_db, "people")
+	defer session.Close()
+	p = Data_find_Person_Last_Uid("-uid")
+	index_last := p.Uid
+	// fmt.Println("index_last")
+	// fmt.Println(index_last)
+	//index, err := strconv.Atoi(last_index)
+	//https://github.com/fatih/structs
+	if s.Salary_HR != "" {
+		sa, err_conv := strconv.Atoi(s.Salary_HR)
+		if err_conv != nil {
+			sa = 0
+			//log.Fatal("Data_find_Person_One: err_conv" + err.Error())
+		}
+		salary_int = sa
+	}
+
+	index_last += 1
+	// fmt.Println(index_last)
+	err := c.Insert(
+		&Person{
+			Uid:                     index_last,
+			Name:                    s.Name,
+			Phone_Home:              s.Phone_Home,
+			Phone_Cell:              s.Phone_Cell,
+			EMAIL:                   s.EMAIL,
+			Identity:                identity,
+			Open_Date:               s.Open_Date,
+			Classes:                 s.Classes,
+			Salary_HR:               s.Salary_HR,
+			Salary_HR_Int:           salary_int,
+			Student_Parents_Contect: s.Student_Parents_Contect,
+			Note:          s.Note,
+			UpdateTime:    time.Now().Format(con_layout),
+			Delete_Record: false,
+		})
+	if err != nil {
+		str_error := err.Error()
+		if strings.Contains(str_error, "duplicate key") {
+			return ("Warning: Username has already been taken. Please input another Name! (ex: John11)")
+		} else {
+			fmt.Println(str_error)
+			//log.Fatal("Data_insert_Person: " + str_error)
+			return "fail"
+		}
+
+	}
+	return "success"
+	//m := structs.Map(server)
+
+}
+func Data_find_Person_One(condition_identity string, sort_string string) Person {
+	c, session := Data_connect_mgo(con_ip, con_db, "people")
+	defer session.Close()
+	//p := Person{}
+	//fmt.Println(reflect.TypeOf(p))
+	M := bson.M{"identity": condition_identity}
+	// Query One
+	result := Person{}
+	err := c.Find(M).Sort(sort_string).One(&result) //Desc
+	if err != nil {
+		result.Uid = 0
+		return result
+	}
+	return result
+}
+
+func Data_find_Person_Last_Uid(sort_string string) Person {
+	c, session := Data_connect_mgo(con_ip, con_db, "people")
+	defer session.Close()
+	M := bson.M{}
+	// Query One
+	result := Person{}
+	err := c.Find(M).Sort(sort_string).One(&result) //Desc
+	if err != nil {
+		result.Uid = 0
+		return result
+	}
+	return result
+
+}
+
+func Data_find_Person_list(identity string) []Person {
+	c, session := Data_connect_mgo(con_ip, con_db, "people")
+	defer session.Close()
+	M := bson.M{"identity": identity, "delete_record": false}
+	query_res := Data_find_person(c, M)
+	fmt.Println(reflect.TypeOf(query_res))
+	return query_res
+}
+
+func Data_find_Class_list() []Class {
+	c, session := Data_connect_mgo(con_ip, con_db, "class")
+	defer session.Close()
+	M := bson.M{"delete_record": false}
+	query_res := Data_find_class(c, M)
+	fmt.Println(reflect.TypeOf(query_res))
+	return query_res
+}
+
+func Data_create_Person(m bson.M) string {
+	c, session := Data_connect_mgo(con_ip, con_db, "people")
+	defer session.Close()
+	if err := c.Insert(m); err != nil {
+		fmt.Println("no")
+
+		return "fail"
+	}
+	fmt.Println("ya")
+	return "success"
+}
+
+// func PrintFields() int {
+// 	return 0
 // }
-func Data_insert_record(s) {
-	// p := new(Assistant_Date)
-	// p.Assistant = "John"
-	// p.Date_Attend = "20170909"
-	// p.Punch_Start_Time = "0800"
-	// p.Punch_End_Time = "1700"
-	// p.UpdateTime = time.Now().Format(layout)
 
-	// err = c.Insert(p)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+func PrintFields(b Person, query_res []Person) {
+	//b := Person{}
+	val := reflect.ValueOf(b)
+	j := 0
+	for j < len(query_res) {
+		fmt.Println(query_res[j])
+		for i := 0; i < val.Type().NumField(); i++ {
+			fmt.Println(val.Type().Field(i).Name)
 
-	err = c.Insert(s)
-	if err != nil {
-		log.Fatal(err)
+		}
+		j += 1
 	}
-	return err
 }
-func Data_find_collection(c, result, M map[string]interface{}) {
-	//result := Person{}
-	err = c.Find(bson.M{M}).One(&result)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return err
-}
-func main() {
-	const layout = "Mon Jan _2 15:04:05 2006"
 
-	// session, err := mgo.Dial("127.0.0.1")
-	// if err != nil {
-	//         panic(err)
-	// }
-	// defer session.Close()
+//str := `{"page": 1, "fruits": ["apple", "peach"]}`
 
-	// Optional. Switch the session to a monotonic behavior.
-	// session.SetMode(mgo.Monotonic, true)
-	// c := session.DB("test").C("assistant_date")
-	// // Index
-	// index := mgo.Index{
-	// 	Key:        []string{"teacher_class"},
-	// 	Unique:     true,
-	// 	DropDups:   true,
-	// 	Background: true,
-	// 	Sparse:     true,
-	// }
-	// err = c.EnsureIndex(index)
-	// if err != nil {
-	// 	panic(err)
-	// }
+// func main() {
+// 	const layout = "Mon Jan _2 15:04:05 2006"
 
-	// p := new(Assistant_Date)
-	// p.Assistant = "John"
-	// p.Date_Attend = "20170909"
-	// p.Punch_Start_Time = "0800"
-	// p.Punch_End_Time = "1700"
-	// p.UpdateTime = time.Now().Format(layout)
+// 	// session, err := mgo.Dial("127.0.0.1")
+// 	// if err != nil {
+// 	//         panic(err)
+// 	// }
+// 	// defer session.Close()
 
-	// err = c.Insert(p)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+// 	// Optional. Switch the session to a monotonic behavior.
+// 	// session.SetMode(mgo.Monotonic, true)
+// 	// c := session.DB("test").C("assistant_date")
+// 	// // Index
+// 	// index := mgo.Index{
+// 	// 	Key:        []string{"teacher_class"},
+// 	// 	Unique:     true,
+// 	// 	DropDups:   true,
+// 	// 	Background: true,
+// 	// 	Sparse:     true,
+// 	// }
+// 	// err = c.EnsureIndex(index)
+// 	// if err != nil {
+// 	// 	panic(err)
+// 	// }
 
-	// result := Person{}
-	// err = c.Find(bson.M{"Name": "Eslie"}).One(&result)
-	// if err != nil {
-	//         log.Fatal(err)
-	// }
+// 	// p := new(Assistant_Date)
+// 	// p.Assistant = "John"
+// 	// p.Date_Attend = "20170909"
+// 	// p.Punch_Start_Time = "0800"
+// 	// p.Punch_End_Time = "1700"
+// 	// p.UpdateTime = time.Now().Format(layout)
 
-	// fmt.Println("Phone:", result.Phone_Cell)
-}
+// 	// err = c.Insert(p)
+// 	// if err != nil {
+// 	// 	log.Fatal(err)
+// 	// }
+
+// 	// result := Person{}
+// 	// err = c.Find(bson.M{"Name": "Eslie"}).One(&result)
+// 	// if err != nil {
+// 	//         log.Fatal(err)
+// 	// }
+
+// 	// fmt.Println("Phone:", result.Phone_Cell)
+// }
