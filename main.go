@@ -41,10 +41,14 @@ func main() {
 	app.Put("/post_data_assistant_edit", postHandler)
 	app.Put("/post_data_assistant_remove", postHandler)
 
+	app.Get("/data_student_name_list", writePathHandler)
+	app.Get("/data_teacher_name_list", writePathHandler)
+	app.Get("/data_assistant_name_list", writePathHandler)
+
 	app.Get("/data_class", writePathHandler)
-	app.Post("/post_data_class", postHandler)
-	app.Put("/post_data_class_edit", postHandler)
-	app.Put("/post_data_class_remove", postHandler)
+	app.Post("/post_data_class", post_class_handler)
+	app.Put("/post_data_class_edit", post_class_handler)
+	app.Put("/post_data_class_remove", post_class_handler)
 
 	app.Get("/", func(ctx iris.Context) {
 		ctx.ViewData("", page{PTitle: "HOME-Victory"})

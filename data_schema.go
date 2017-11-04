@@ -39,7 +39,7 @@ type Person struct {
 	EMAIL                   string `json: "email" bson:"email"`           // Nil
 	Identity                string `json: "identity" bson:"identity"`     // student/ teacher/ assistant
 	Open_Date               string `json: "open_date" bson:"open_date"`
-	Classes                 string `json: "classess" bson:"classess"`   //[A,B..] or nil
+	Classes                 string `json: "classes" bson:"classes"`     //[A,B..] or nil
 	Salary_HR_Int           int    `json: "salary_hr" bson:"salary_hr"` //[same as Salary table] for Teacher and Assistant only
 	Salary_HR               string `json: "salary_hr" bson:"salary_hr"`
 	Student_Parents_Contect string `json: "student_parents_contect" bson:"student_parents_contect"`
@@ -64,6 +64,7 @@ type Person struct {
 /*==========Class Management=================*/
 type Class struct {
 	Cid          int    `json: "cid" bson:"cid"`
+	Class_Name   string `json: "class_name" bson:"class_name"`     //chinese name
 	Class        string `json: "class" bson:"class"`               //[uniqle] Name of class ex: English A, English B
 	Day          string `json: "day" bson:"day"`                   // Fixed day ex: friday
 	Time_HR      string `json: "time_hr" bson:"time_hr"`           // Fixed time ex: 1430 -> 14:30
@@ -73,10 +74,13 @@ type Class struct {
 	Num_Students int    `json: "num_students" bson:"num_students"` // number of students
 	Course_Type  string `json: "course_type" bson:"course_type"`   // ex: math or english
 	//student
-	Students          []string `json: "students" bson:"students"`                   // Name of students: [..,..]
-	Cost_Each_Student int      `json: "cost_each_student" bson:"cost_each_student"` // cost of a class each student
-	UpdateTime        string   `json: "updatetime" bson:"updatetime"`               // Array timestamp
-	Delete_Record     bool     `json: "delete_record" bson:"delete_record"`         // 1 = delete but is not in the trash
+	Students              string `json: "students" bson:"students"`                           //a,b,c
+	Cost_Each_Student_Str string `json: "cost_each_student_str" bson:"cost_each_student_str"` // Name of students: [..,..]
+	Cost_Each_Student     int    `json: "cost_each_student" bson:"cost_each_student"`
+	Charge_Times_Int      int    `json: "charge_times" bson:"charge_times"` // cost of a class each student
+	Charge_Times          string
+	UpdateTime            string `json: "updatetime" bson:"updatetime"`       // Array timestamp
+	Delete_Record         bool   `json: "delete_record" bson:"delete_record"` // 1 = delete but is not in the trash
 
 }
 
@@ -378,6 +382,16 @@ func Data_connect_mgo(serverIP string, db string, collection string) (*mgo.Colle
 	return c, session
 }
 
+// func Data_find_person_one_field(c *mgo.Collection, M bson.M, one_field string) []Person {
+// 	person := []Person{}
+// 	//err := c.Find(M).One(&result)
+// 	err := c.Find(M).Select(bson.M{one_field: 1}).All(&person)
+// 	if err != nil {
+// 		log.Fatal("Data_find_person: " + err.Error())
+// 	}
+// 	table_count = len(person)
+// 	return person
+// }
 func Data_find_person(c *mgo.Collection, M bson.M) []Person {
 	person := []Person{}
 	//err := c.Find(M).One(&result)
@@ -433,6 +447,96 @@ func Data_remove_Person(s []Person, identity string) string {
 
 	}
 
+	return "success"
+}
+
+func Data_remove_Class(s []Class) string {
+	//p := Person{}
+	fmt.Println("===dmc")
+	fmt.Println(s)
+
+	c, session := Data_connect_mgo(con_ip, con_db, "class")
+	defer session.Close()
+	for _, ss := range s {
+		//suport to remove multiple records
+		colQuerier := bson.M{
+			strings.ToLower("Class"): ss.Class,
+		}
+		update_field := bson.M{
+			strings.ToLower("UpdateTime"):    time.Now().Format(con_layout),
+			strings.ToLower("Delete_Record"): true,
+		}
+		change := bson.M{"$set": update_field}
+		fmt.Println(colQuerier)
+		fmt.Println(update_field)
+		fmt.Println(change)
+		err := c.Update(colQuerier, change)
+		if err != nil {
+			fmt.Println(err.Error())
+			log.Fatal("Data_remove_Class: " + err.Error())
+		}
+
+	}
+
+	return "success"
+}
+
+func Data_update_Class(s Class) string {
+	cost_int := 0
+	//charge_times := 0
+	c, session := Data_connect_mgo(con_ip, con_db, "class")
+	defer session.Close()
+	if s.Cost_Each_Student_Str != "" {
+		cost, err_conv := strconv.Atoi(s.Cost_Each_Student_Str)
+		if err_conv != nil {
+			cost = 0
+			//log.Fatal("Data_find_Person_One: err_conv" + err.Error())
+		}
+		cost_int = cost
+	}
+
+	// if s.Charge_Times != "" {
+	// 	intt, err_conv := strconv.Atoi(s.Charge_Times)
+	// 	if err_conv != nil {
+	// 		intt = 0
+	// 		//log.Fatal("Data_find_Person_One: err_conv" + err.Error())
+	// 	}
+	// 	charge_times = cost
+	// }
+	//[]string{"Kristen"}
+
+	// Update
+	colQuerier := bson.M{
+		strings.ToLower("Class"): s.Class,
+	}
+	update_field := bson.M{
+		//"Uid": index_last,
+		//Name:                    s.Name,
+		strings.ToLower("Class_Name"):            s.Class_Name,
+		strings.ToLower("Day"):                   s.Day,
+		strings.ToLower("Time_HR"):               s.Time_HR,
+		strings.ToLower("Duration_HR"):           s.Duration_HR,
+		strings.ToLower("Open_Date"):             s.Open_Date,
+		strings.ToLower("Teacher"):               s.Teacher,
+		strings.ToLower("Course_Type"):           s.Course_Type,
+		strings.ToLower("Students"):              s.Students,
+		strings.ToLower("Num_Students"):          len(strings.Split(s.Students, ",")),
+		strings.ToLower("Charge_Times"):          s.Charge_Times,
+		strings.ToLower("Cost_Each_Student_Str"): s.Cost_Each_Student_Str,
+		strings.ToLower("Cost_Each_Student"):     cost_int,
+		strings.ToLower("UpdateTime"):            time.Now().Format(con_layout),
+		strings.ToLower("Delete_Record"):         false,
+	}
+	change := bson.M{"$set": update_field}
+	fmt.Println(colQuerier)
+	fmt.Println(update_field)
+	fmt.Println(change)
+	err := c.Update(colQuerier, change)
+	if err != nil {
+		fmt.Println(err.Error())
+		return ("Warning: System Error. DUC")
+		//log.Fatal("Data_update_Person: " + err.Error())
+	}
 	return "success"
 }
 
@@ -536,6 +640,81 @@ func Data_insert_Person(s Person, identity string) string {
 	//m := structs.Map(server)
 
 }
+
+func Data_insert_Class(s Class) string {
+
+	cost_int := 0
+	charge_times := 0
+	//fmt.Println(s.Name)
+	p := Class{}
+	c, session := Data_connect_mgo(con_ip, con_db, "class")
+	defer session.Close()
+	p = Data_find_Class_Last_Cid("-cid")
+	index_last := p.Cid
+	if s.Cost_Each_Student_Str != "" {
+		cost, err_conv := strconv.Atoi(s.Cost_Each_Student_Str)
+		if err_conv != nil {
+			cost = 0
+			//log.Fatal("Data_find_Person_One: err_conv" + err.Error())
+		}
+		cost_int = cost
+	}
+	if s.Charge_Times != "" {
+		times, err_conv := strconv.Atoi(s.Charge_Times)
+		if err_conv != nil {
+			times = 0
+			//log.Fatal("Data_find_Person_One: err_conv" + err.Error())
+		}
+		charge_times = times
+	}
+
+	if s.Cost_Each_Student_Str != "" {
+		cost, err_conv := strconv.Atoi(s.Cost_Each_Student_Str)
+		if err_conv != nil {
+			cost = 0
+			//log.Fatal("Data_find_Person_One: err_conv" + err.Error())
+		}
+		cost_int = cost
+	}
+	index_last += 1
+	// fmt.Println(index_last)
+	err := c.Insert(
+		&Class{
+			Cid:          index_last,
+			Class:        s.Class,
+			Class_Name:   s.Class_Name,
+			Day:          s.Day,
+			Time_HR:      s.Time_HR,
+			Duration_HR:  s.Duration_HR,
+			Open_Date:    s.Open_Date,
+			Teacher:      s.Teacher,
+			Num_Students: len(strings.Split(s.Students, ",")),
+			Course_Type:  s.Course_Type,
+			//student
+			Students:              s.Students,
+			Charge_Times_Int:      charge_times,
+			Charge_Times:          s.Charge_Times,
+			Cost_Each_Student_Str: s.Cost_Each_Student_Str,
+			Cost_Each_Student:     cost_int,
+			UpdateTime:            time.Now().Format(con_layout),
+			Delete_Record:         false,
+		})
+	if err != nil {
+		str_error := err.Error()
+		if strings.Contains(str_error, "duplicate key") {
+			return ("Warning: Class name has already been taken. Please input another Name! (ex: ENG12)")
+		} else {
+			fmt.Println(str_error)
+			//log.Fatal("Data_insert_Person: " + str_error)
+			return "fail"
+		}
+
+	}
+	return "success"
+	//m := structs.Map(server)
+
+}
+
 func Data_find_Person_One(condition_identity string, sort_string string) Person {
 	c, session := Data_connect_mgo(con_ip, con_db, "people")
 	defer session.Close()
@@ -564,7 +743,38 @@ func Data_find_Person_Last_Uid(sort_string string) Person {
 		return result
 	}
 	return result
+}
 
+func Data_find_Class_Last_Cid(sort_string string) Class {
+	c, session := Data_connect_mgo(con_ip, con_db, "class")
+	defer session.Close()
+	M := bson.M{}
+	// Query One
+	result := Class{}
+	err := c.Find(M).Sort(sort_string).One(&result) //Desc
+	if err != nil {
+		result.Cid = 0
+		return result
+	}
+	return result
+}
+
+func Data_find_Person_Name_List(identity string) string {
+	str_res := ""
+	c, session := Data_connect_mgo(con_ip, con_db, "people")
+	defer session.Close()
+	M := bson.M{"identity": identity, "delete_record": false}
+	person := []Person{}
+	err := c.Find(M).Select(bson.M{"name": 1}).All(&person)
+	if err != nil {
+		log.Fatal("Data_find_Person_Name_List: " + err.Error())
+	}
+	for _, v := range person {
+		//fmt.Println(v.Name)
+		str_res += v.Name + ","
+	}
+	//fmt.Println(str_res[:len(str_res)-1])
+	return str_res[:len(str_res)-1]
 }
 
 func Data_find_Person_list(identity string) []Person {

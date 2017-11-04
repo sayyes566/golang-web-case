@@ -4,14 +4,18 @@
 <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/select/1.2.3/js/dataTables.select.min.js"></script>
-<script src="/js/dataTables.editor.min.js"></script>
+<!--script src="/js/dataTables.editor.min.js"></script-->
+<script type="text/javascript" src="/js/jquery.timepicker.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/css/jquery.timepicker.min.css" />
+
 <script src="/js/data.js"></script>
 <main class="col-sm-10 ml-sm-auto col-md-12 pt-3 pl-3" role="main">
 <h1>Classes</h1>
-      <table id="data_table" class="display" cellspacing="0" width="100%">
+      <table id="data_table" class="hover row-border" cellspacing="0" width="100%">
           <thead>
               <tr>
-                  <th>Class</th>
+                  <th>Full Name</th>
+                  <th>Class Code</th>
                   <th>Day</th>
                   <th>Time</th>
                   <th>Duration</th>
@@ -20,11 +24,14 @@
                   <th>Type</th>
                   <th>Students</th>
                   <th>Cost</th>
+                  <th>Charge Times</th>
               </tr>
           </thead>
           <tfoot>
               <tr>
-                  <th>Class</th>
+                  
+                  <th>Full Name</th>
+                  <th>Class code</th>
                   <th>Day</th>
                   <th>Time</th>
                   <th>Duration</th>
@@ -33,9 +40,12 @@
                   <th>Type</th>
                   <th>Students</th>
                   <th>Cost</th>
+                  <th>Charge Times</th>
               </tr>
           </tfoot>
       </table>
+      <!-- <div class="timepicker"></div> -->
+     
 </main>
       
 

@@ -39,6 +39,27 @@ func writePathHandler(ctx iris.Context) {
 		ctx.JSON(res)
 		fmt.Println(res)
 		ctx.Writef("}")
+	case "/data_student_name_list":
+		fmt.Println("data_test")
+		res := Data_find_Person_Name_List("Student")
+		ctx.Writef("{\"data\": ")
+		ctx.JSON(res)
+		fmt.Println(res)
+		ctx.Writef("}")
+	case "/data_teacher_name_list":
+		fmt.Println("data_test")
+		res := Data_find_Person_Name_List("Teacher")
+		ctx.Writef("{\"data\": ")
+		ctx.JSON(res)
+		fmt.Println(res)
+		ctx.Writef("}")
+	case "/data_assistant_name_list":
+		fmt.Println("data_test")
+		res := Data_find_Person_Name_List("Assistant")
+		ctx.Writef("{\"data\": ")
+		ctx.JSON(res)
+		fmt.Println(res)
+		ctx.Writef("}")
 	default:
 		ctx.Writef("")
 	}
@@ -51,7 +72,77 @@ func writePathHandler(ctx iris.Context) {
 	//fmt.Println(res)
 
 }
+func post_class_handler(ctx iris.Context) {
 
+	page_now := ctx.Path()
+	c := &Class{}
+	c_multi := []Class{}
+
+	switch page_now {
+
+	case "/post_data_class", "/post_data_class_edit":
+		c = &Class{}
+	case "/post_data_class_remove":
+		c_multi = []Class{}
+	default:
+		ctx.Writef("fail")
+	}
+
+	//c := &Person{}
+	//post jason data and read it
+	fmt.Println(&c_multi)
+	if strings.Contains(page_now, "remove") {
+		if err := ctx.ReadJSON(&c_multi); err != nil {
+			ctx.StatusCode(iris.StatusBadRequest)
+			ctx.WriteString(err.Error())
+			ctx.Writef("fail")
+		}
+	} else {
+		if err := ctx.ReadJSON(c); err != nil {
+			ctx.StatusCode(iris.StatusBadRequest)
+			ctx.WriteString(err.Error())
+			ctx.Writef("fail")
+		}
+	}
+
+	res := ""
+
+	if strings.Contains(page_now, "edit") {
+		res = Data_update_Class(*c)
+	} else if strings.Contains(page_now, "remove") {
+		res = Data_remove_Class(c_multi)
+	} else if strings.Contains(page_now, "data") {
+		res = Data_insert_Class(*c)
+	} else {
+		ctx.Writef("fail")
+	}
+
+	//res := Data_insert_Person(*c, identity)
+	fmt.Println(page_now)
+	if res != "success" {
+		ctx.Writef(string("{ \"error\": \"" + res + "\" }"))
+	} else {
+		if strings.Contains(page_now, "remove") {
+			fmt.Println("=======remove")
+			ctx.WriteString("OK")
+			//ctx.Writef("")
+		} else {
+			m := structs.Map(*c)
+			b, err := json.Marshal(m)
+			fmt.Println("=======m")
+			fmt.Println(m)
+			fmt.Println("=======b")
+			fmt.Println(b)
+			if err != nil {
+				fmt.Println(err.Error())
+				fmt.Println("=======error")
+				ctx.Writef("fail")
+			}
+			ctx.Writef(string(b))
+		}
+
+	}
+}
 func postHandler(ctx iris.Context) {
 
 	page_now := ctx.Path()
@@ -70,17 +161,18 @@ func postHandler(ctx iris.Context) {
 		c = &Person{}
 		identity = "Teacher"
 	case "/post_data_teacher_remove":
-
 		c_multi = []Person{}
 		identity = "Teacher"
-		fmt.Println(identity)
-		fmt.Println(identity)
 	case "/post_data_assistant", "/post_data_assistant_edit":
 		c = &Person{}
 		identity = "Assistant"
 	case "/post_data_assistant_remove":
 		c_multi = []Person{}
 		identity = "Assistant"
+	// case "/post_data_class", "/post_data_class_edit":
+	// 	c = &Class{}
+	// case "/post_data_class_remove":
+	// 	c_multi = []Class{}
 	default:
 		ctx.Writef("fail")
 	}
@@ -105,6 +197,19 @@ func postHandler(ctx iris.Context) {
 	fmt.Println("identity")
 	fmt.Println(identity)
 	res := ""
+	// if strings.Contains(page_now, "class") {
+	// 	//class page
+	// 	if strings.Contains(page_now, "edit") {
+	// 		res = Data_update_Class(*c, identity)
+	// 	} else if strings.Contains(page_now, "remove") {
+	// 		res = Data_remove_Class(c_multi, identity)
+	// 	} else if strings.Contains(page_now, "data") {
+	// 		res = Data_insert_Class(*c, identity)
+	// 	} else {
+	// 		ctx.Writef("fail")
+	// 	}
+	// } else {
+	// member pages
 	if strings.Contains(page_now, "edit") {
 		res = Data_update_Person(*c, identity)
 	} else if strings.Contains(page_now, "remove") {
@@ -114,6 +219,8 @@ func postHandler(ctx iris.Context) {
 	} else {
 		ctx.Writef("fail")
 	}
+	// }
+
 	// switch page_now {
 	// case "/post_data_student":
 	// 	res = Data_insert_Person(*c, identity)
