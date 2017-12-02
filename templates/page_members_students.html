@@ -1,43 +1,142 @@
 
 
 
-<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/select/1.2.3/js/dataTables.select.min.js"></script>
+<script src="/js/datatables.min.js"></script>
+<!--script src="https://cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/select/1.2.3/js/dataTables.select.min.js"></script-->
 <!--script src="/js/dataTables.editor.min.js"></script-->
 <script src="/js/data.js"></script>
 <main class="col-sm-10 ml-sm-auto col-md-12 pt-3 pl-3" role="main">
 <h1>Students</h1>
+    <div id="modal_dialog" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modal_dialogLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modal_dialogLabel">Add A New Student</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                    <form class="bd-example">
+                            <fieldset>
+                              <legend></legend>
+                          
+                              <p class="row">
+                                  <label class="col-5" for="input_student">Student Name</label>
+                                  <input class="col-6" type="text" id="input_student" placeholder="ex: 王大大">
+                              </p>
+                              <p class="row">
+                                  <label class="col-5" for="input_phone">Phone(home)</label>
+                                  <input class="col-6" type="text" id="input_phone" placeholder="ex: 021234567">
+                              </p>
+                              <p class="row"> 
+                                  <label class="col-5" for="input_cellphone">Cellphone</label>
+                                  <input class="col-6" type="text" id="input_cellphone" placeholder="ex: 0912345678">
+                              </p>
+                              <p class="row">
+                                  <label class="col-5" for="input_email">E-mail</label>
+                                  <input class="col-6" type="email" id="input_email" placeholder="ex: alice@gmail.com">
+                              </p>
+                              <p class="row"> 
+                                <label class="col-5" for="input_parents_contect">Parents Contect(phone)</label>
+                                <input class="col-6" type="text" id="input_parents_contect" placeholder="ex: 0912345678">
+                             </p>
+                              <p class="row">
+                                <label class="col-5" for="join_date">Join Time</label>
+                                <input class="col-6" type="date" id="join_date">
+                              </p>
+                              <p class="row">
+                                <label class="col-5" for="select">Class Name</label>
+                                <select class="col-6" id="select_classes" multiple="multiple">
+                                  <option value="">選擇課程</option>
+                                  <optgroup label="English">
+                                    <option value="e">Option 1</option>
+                                    <option value="d">Option 2</option>
+                                    <option value="f">Option 3</option>
+                                  </optgroup>
+                                  <optgroup label="Japanese">
+                                    <option value="ko">Option 4</option>
+                                    <option value="ni">Option 5</option>
+                                    <option value="ji">Option 6</option>
+                                  </optgroup>
+                                </select>
+                              </p>
+                             <p class="row">
+                                    <label class="col-5" for="textarea_note">Note</label>
+                                    <textarea class="col-6" id="textarea_note" rows="3"></textarea>
+                            </p>
+                            </fieldset>
+                          </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary save_teacher">Save</button>
+            </div>
+          </div>
+        </div>
+    </div>
+        <div class="bd">
+            <button type="button" class="add_new btn btn-primary float-right" data-toggle="modal" data-target="#modal_dialog">
+              ADD NEW
+            </button>
+            <button type="button" class="update btn btn-outline-secondary float-right" data-toggle="modal" data-target="#modal_dialog" disabled>
+              UPDATE
+            </button>
+            <button type="button" class="delete btn btn-outline-secondary float-right" data-toggle="modal" data-target="#modal_confirm" disabled>
+              DELETE
+            </button>
+        </div>
+          <br />
+          <br />
       <table id="data_table" class="hover row-border" cellspacing="0" width="100%">
           <thead>
               <tr>
-                  <th>Name</th>
-                  <th>Phone (Home)</th>
-                  <th>Phone (Mobile)</th>
-                  <th>EMAIL</th>
-                  <th>Classes</th>
-                  <th>Join Date</th>
-                  <th>Parents Contect</th>
-                  <th>Note</th>
-                
+                <th>Name</th>
+                <th>Phone (Home)</th>
+                <th>Phone (Mobile)</th>
+                <th>EMAIL</th>
+                <th>Classes</th>
+                <th>Join Date</th>
+                <th>Parents Contect</th>
+                <th>Note</th>           
               </tr>
           </thead>
           <tfoot>
               <tr>
-                    <th>Name</th>
-                    <th>Phone (Home)</th>
-                    <th>Phone (Mobile)</th>
-                    <th>EMAIL</th>
-                    <th>Classes</th>
-                    <th>Join Date</th>
-                    <th>Parents Contect</th>
-                    <th>Note</th>
+                <th>Name</th>
+                <th>Phone (Home)</th>
+                <th>Phone (Mobile)</th>
+                <th>EMAIL</th>
+                <th>Classes</th>
+                <th>Join Date</th>
+                <th>Parents Contect</th>
+                <th>Note</th>
               </tr>
           </tfoot>
       </table>
 </main>
+<div id="modal_confirm" class="modal fade" tabindex="1" role="dialog" aria-labelledby="modal_dialogLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal_dialogLabel">{{ confirm_del_title "" }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body modal_confirm_body">
+            {{ confirm_del_body "" }}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary confirm_btn">{{ confirm_del_submit ""}}</button>
+      </div>
+    </div>
+  </div>
+</div>
       
 
-      
+
 
       

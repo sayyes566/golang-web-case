@@ -1,11 +1,38 @@
 var editor; // use a global for the submit and return data rendering in the examples
 var table; //data_table
-var field_name; // table > field : name , not allow to edit
+var not_allow_edit_field; // table > field : name , not allow to edit
 var editor_field; // table > field : name , not allow to edit
 var url_post_member_teacher = "/post_data_teacher"
 var url_edit_member_teacher = "/post_data_teacher_edit"
 var url_delete_member_teacher = "/post_data_teacher_remove"
 var url_member_teacher = "/members/teachers"
+
+var url_account_teacher = "/data_account_teacher"
+var url_post_account_teacher = "/post_account_teacher"
+var url_post_account_teacher_edit = "/post_account_teacher_edit"
+var url_post_account_teacher_remove = "/post_account_teacher_remove"
+
+var url_account_student = "/data_account_student"
+var url_post_account_student = "/post_account_student"
+var url_post_account_student_edit = "/post_account_student_edit"
+var url_post_account_student_remove = "/post_account_student_remove"
+
+var url_account_assistant = "/data_account_assistant"
+var url_post_account_assistant = "/post_account_assistant"
+var url_post_account_assistant_edit = "/post_account_assistant_edit"
+var url_post_account_assistant_remove = "/post_account_assistant_remove"
+
+var url_notice = "/data_notice"
+var url_post_notice = "/post_notice"
+var url_post_notice_edit = "/post_notice_edit"
+var url_post_notice_remove_remove = "/post_notice_remove"
+
+var List_teacher;
+var List_student;
+var List_assistant;
+
+
+//var selected_datas = ''
 
 var button_click_name = ""
 
@@ -92,14 +119,26 @@ var fill_warning = function(col_name, type){
 
 
 
-
+//get selected records
 var get_click_rows_data = function(){
     return table.rows('.selected').data()
+}
+//get selected record names
+var get_selected_names = function(){
+    selected_datas = get_click_rows_data();
+    console.log(selected_datas)
+    len_datas = selected_datas.length
+    str_names = ""
+    for (i=0; i < len_datas; i++){
+        str_names += selected_datas[i]['Name'] + ", "
+    }
+    return str_names.substring(0, str_names.length -2) 
 }
 
 //pre update
 var assign_update_form = function(){
     let data = get_click_rows_data()
+    
     let pathName = window.location.pathname 
     if(pathName == url_member_teacher){
         $("#input_teacher").val(data[0]['Name'])
@@ -109,6 +148,8 @@ var assign_update_form = function(){
         $("#classes_output").val(data[0]['Classes'])
         $("#join_date").val(data[0]['Open_Date'])
         $("#input_salary").val(data[0]['Salary_HR'])
+        $("#textarea_note").val(data[0]['Note'])
+        
     }
 }
 
@@ -124,9 +165,10 @@ var delete_records = function(){
                 identity: data[i].Identity,
             }
         }
+        console.log(JSON.stringify(rm))
+        save_todo( JSON.stringify(rm), url_delete_member_teacher, "PUT")
     }
-    console.log(JSON.stringify(rm))
-    save_todo( JSON.stringify(rm), url_delete_member_teacher, "PUT")
+    
     
 }
 
@@ -156,6 +198,50 @@ var clear_form = function(){
     }, 1000 );
 }
 
+
+//===========add update option======
+var select_options = function(this_id){
+    let output_id = $("#"+this_id).parents("p").next().children()[1].id
+    console.log(output_id)
+    let val_classes = $("#"+output_id).val()
+    let new_class = $("#"+this_id).val()
+    console.log(val_classes)
+    exist = val_classes.split(new_class)
+    if (exist.length > 1){
+        //remove existed option
+       
+        let exist_con = val_classes.split(new_class+",")
+        if (exist_con.length > 1){
+            $("#"+output_id).val(exist_con[0] +  exist_con[1] )
+        }else{
+            let exist_con = val_classes.split("," + new_class)
+            if (exist_con.length > 1){
+                $("#"+output_id).val(exist_con[0])
+            }else{
+                $("#"+output_id).val("")
+            }
+        }
+    }else{
+        //add new option
+        if (val_classes == "") val_classes = ""
+        else val_classes = val_classes + ","
+        $("#"+output_id).val(val_classes +  new_class)
+    }
+
+}
+
+setTimeout(function(){
+    //
+    $("#select_classes").click(function(){
+        console.log($(this).attr('id'))
+        return select_options($(this).attr('id'))
+    })
+     //
+    
+
+},2000)
+
+
 //click and submit form. step 2
 var save_todo = function(string_json_data, url, http_type,  callback){
     $.ajax({
@@ -164,12 +250,15 @@ var save_todo = function(string_json_data, url, http_type,  callback){
         dataType: "Json",
         data: string_json_data,
         success: function(result){
+            console.log("=  save 1===")
             console.log(result)
             let str_res = result.toString()
+            console.log("=  save 2===")
             console.log(str_res)
             if(str_res.split("warn").length < 2 && str_res.split("error").length < 2)
                 return callback()
         },error: function(err){
+            console.log("=  error 1===")
             console.log(err)
         }
         
@@ -218,56 +307,7 @@ var save_pre = function(){
 }
 
 var table_m_s = function(){
-    /*
-    editor = new $.fn.dataTable.Editor( {
-        ajax: {
-            create: $.extend( true, {}, ajaxBase, {
-                type:"POST",
-                url: "/post_data_student"
-            }),
-            edit: $.extend( true, {}, ajaxBase,{
-                type: "PUT",
-                url:  "/post_data_student_edit"
-            }),
-            remove: $.extend( true, {}, ajaxBase,{
-                type: "PUT",
-                url:  "/post_data_student_remove"
-            })
-       },
-        //ajax: "/post_data_student",
-        table: "#data_table",
-        idSrc:  'Uid',
-        
-        fields: [ {
-                label: "Name:",
-                name: "Name"
-            }, {
-                label: "Phone (Home):",
-                name: "Phone_Home"
-            }, {
-                label: "Phone (CellPHONE):",
-                name: "Phone_Cell"
-            }, {
-                label: "EMAIL:",
-                name: "EMAIL"
-            }, {
-                label: "Classes:",
-                name: "Classes"
-            }, {
-                label: "Join Date:",
-                name: "Open_Date",
-                type: "datetime"
-            },
-             {
-                 label: "Parents Contect:",
-                 name: "Student_Parents_Contect"
-             },{
-                 label: "Note:",
-                 name: "Note"
-             }
-            
-        ]
-    } );*/
+   
      table = $('#data_table').DataTable( {
 　　　　  //  dom: "Bfrtip",
          //   ajax: "/json/data.txt",
@@ -284,80 +324,13 @@ var table_m_s = function(){
             { data: "Open_Date" },
             { data: "Student_Parents_Contect" },
             { data: "Note" }
-     
-            //{ data: "UpdateTime" }
-         //    { data: "salary", render: $.fn.dataTable.render.number( ',', '.', 0, '$' ) }
+
         ]
-        //select: true
-        /*buttons: [
-            { extend: "create", editor: editor },
-            { extend: "edit",   editor: editor },
-            { extend: "remove", editor: editor }
-        ]*/
     } );
 }
 
 
 var table_m_t = function(){
-    /*
-    editor = new $.fn.dataTable.Editor( {
-       // ajax: "/json/staff.php",
-        ajax: {
-                create: $.extend( true, {}, ajaxBase, {
-                    type:"POST",
-                    url: "/post_data_teacher"
-                }),
-                edit: $.extend( true, {}, ajaxBase,{
-                    type: "PUT",
-                    url:  "/post_data_teacher_edit"
-                }),
-                remove: $.extend( true, {}, ajaxBase,{
-                    type: "PUT",
-                    url:  "/post_data_teacher_remove"
-                })
-        },
-        table: "#data_table",
-        idSrc:  'Uid',
-        fields: [ {
-                label: "Name:",
-                name: "Name"
-            }, {
-                label: "Phone (Home):",
-                name: "Phone_Home"
-            }, {
-                label: "Phone (CellPHONE):",
-                name: "Phone_Cell"
-            }, {
-                label: "EMAIL:",
-                name: "EMAIL"
-            }, {
-                label: "Classes:",
-                name: "Classes"
-            },
-         //    }, {
-         //        label: "Start date:",
-         //        name: "start_date",
-         //        type: "datetime"
-         //    }, 
-            {
-                label: "Join Date:",
-                name: "Open_Date",
-                type: "datetime"
-            },
-             {
-                 label: "Salary (HR):",
-                 name: "Salary_HR"
- 
-             },{
-                 label: "Note:",
-                 name: "Note"
-             }
-             // ,{
-             //     label: "UpdateTime:",
-             //     name: "UpdateTime"
-             // }
-        ]
-    } );*/
      table = $('#data_table').DataTable( {
         //dom: "Bfrtip",
      //    ajax: "/json/data.txt",
@@ -373,64 +346,12 @@ var table_m_t = function(){
             { data: "Salary_HR" ,  render: $.fn.dataTable.render.number( ',', '.', 0, '$' )},
             { data: "Note" }
         ],
-      //  select: true,
-      /*  buttons: [
-            { extend: "create", editor: editor },
-            { extend: "edit",   editor: editor },
-            { extend: "remove", editor: editor }
-        ]*/
     } );
 }
 
 
 var table_m_a = function(){
-    /*
-    editor = new $.fn.dataTable.Editor( {
-        //ajax: "/json/staff.php",
-        ajax: {
-            create: $.extend( true, {}, ajaxBase, {
-                type:"POST",
-                url: "/post_data_assistant"
-            }),
-            edit: $.extend( true, {}, ajaxBase,{
-                type: "PUT",
-                url:  "/post_data_assistant_edit"
-            }),
-            remove: $.extend( true, {}, ajaxBase,{
-                type: "PUT",
-                url:  "/post_data_assistant_remove"
-            })
-       },
-        table: "#data_table",
-        idSrc:  'Uid',
-        fields: [ {
-                label: "Name:",
-                name: "Name"
-            }, {
-                label: "Phone (Home):",
-                name: "Phone_Home"
-            }, {
-                label: "Phone (CellPHONE):",
-                name: "Phone_Cell"
-            }, {
-                label: "EMAIL:",
-                name: "EMAIL"
-            }, 
-            {
-                label: "Join Date:",
-                name: "Open_Date",
-                type: "datetime"
-            },
-            {
-                label: "Salary (HR):",
-                name: "Salary_HR"
-
-            },{
-                 label: "Note:",
-                 name: "Note"
-             }
-        ]
-    } );*/
+    
      table = $('#data_table').DataTable( {
       //  dom: "Bfrtip",
      //    ajax: "/json/data.txt",
@@ -448,117 +369,14 @@ var table_m_a = function(){
             //{ data: "UpdateTime" }
          //    { data: "salary", render: $.fn.dataTable.render.number( ',', '.', 0, '$' ) }
         ],
-      //  select: true,
-       /* buttons: [
-            { extend: "create", editor: editor },
-            { extend: "edit",   editor: editor },
-            { extend: "remove", editor: editor }
-        ]*/
     } );
 }
 
 
 var table_c = function(){
-    //classes
-    /*
-    editor = new $.fn.dataTable.Editor( {
-        //ajax: "/json/staff.php",
-        ajax: {
-            create: $.extend( true, {}, ajaxBase, {
-                type:"POST",
-                url: "/post_data_class"
-            }),
-            edit: $.extend( true, {}, ajaxBase,{
-                type: "PUT",
-                url:  "/post_data_class_edit"
-            }),
-            remove: $.extend( true, {}, ajaxBase,{
-                type: "PUT",
-                url:  "/post_data_class_remove"
-            })
-       },
-        table: "#data_table",
-        idSrc:  'Cid',
-        fields: [{
-                label: "Class Name (full name) ",
-                name: "Class_Name"
-            }, {
-                label: "Class Name（unique code name)",
-                name: "Class",
-                def: "must input this field, ex: ENG12"
-            }, {
-                label: "Class Day",
-                name: "Day",
-                type: "select",
-                options: [
-                    { label: "Monday", value: "Monday" },
-                    { label: "Tuesday", value: "Tuesday" },
-                    { label: "Wednesday", value: "Wednesday" },
-                    { label: "Thursday", value: "Thursday" },
-                    { label: "Friday", value: "Friday" },
-                    { label: "Saturday", value: "Saturday" },
-                    { label: "Sunday", value: "Sunday" }
-                ]
-            }, {
-                label: "Class Time",
-                name: "Time_HR",
-                className: "timepicker" 
-            }, {
-                label: "Duration(HR ex: 2.5)",
-                name: "Duration_HR",
-                type: "select",
-                options: [
-                    { label: "1 Hour", value: "1" },
-                    { label: "1.5 Hours", value: "1.5" },
-                    { label: "2 Hours", value: "2" },
-                    { label: "2.5 Hours", value: "2.5" },
-                    { label: "3 Hours", value: "3" },
-                    { label: "3.5 Hours", value: "3.5" },
-                    { label: "4 Hours", value: "4" },
-                    { label: "4.5 Hours", value: "4.5" },
-                    { label: "5 Hours", value: "5" },
-                    { label: "5.5 Hours", value: "5.5" },
-                    { label: "6 Hours", value: "6" },
-                    { label: "6.5 Hours", value: "6.5" },
-                    { label: "7 Hours", value: "7" },
-                    { label: "7.5 Hours", value: "7" },
-                    { label: "8 Hours", value: "8" }
-                   
-                ]
-            }, 
-            {
-                label: "Join Date",
-                name: "Open_Date",
-                type: "datetime"
-            },
-            {
-                label: "Teacher",
-                name: "Teacher"
-
-            },{
-                 label: "Class Type",
-                 name: "Course_Type",
-                 def: "English, Mathematics or Japanese"
-                
-             },{
-                label: "Students",
-                name: "Students"
-            },{
-                label: "Cost (each student)",
-                name: "Cost_Each_Student_Str"
-            },{
-                label: "Charge Times: (ex: 5 )",
-                name: "Charge_Times",
-                def: 8
-                
-            }
-        ]
-    } );*/
      table = $('#data_table').DataTable( {
-      //  dom: "Bfrtip",
-     //    ajax: "/json/data.txt",
         ajax: "/data_class",
-        idSrc:  'Cid',
+
         columns: [
             { data: "Class_Name" },
             { data: "Class" },
@@ -574,17 +392,62 @@ var table_c = function(){
             //{ data: "UpdateTime" }
          //    { data: "salary", render: $.fn.dataTable.render.number( ',', '.', 0, '$' ) }
         ],
-        /*
-        select: true,
-        buttons: [
-            { extend: "create", editor: editor },
-            { extend: "edit",   editor: editor },
-            { extend: "remove", editor: editor }
-        ]*/
     } );
 }
 
-var Name_List = ""
+var table_a_s = function(){
+    table = $('#data_table').DataTable( {
+       ajax: url_account_student,
+       select: true,
+       columns: [
+           { data: "Student" },
+           { data: "Class" },
+           { data: "Date_Start_Study" },
+           { data: "Date_Next_Pay" }
+       ],
+   } );
+}
+var table_a_t = function(){
+    table = $('#data_table').DataTable( {
+       ajax: url_account_teacher,
+       select: true,
+       columns: [
+        { data: "Teacher" },
+        { data: "Class" },
+        { data: "Date_Next_Earn" },
+        { data: "HR_Salary" },
+        { data: "Earn_Next" }
+       ],
+   } );
+}
+var table_a_a = function(){
+    table = $('#data_table').DataTable( {
+       ajax: url_account_assistant,
+       idSrc:  'Cid',
+       select: true,
+       columns: [
+           { data: "Assistant" },
+           { data: "HR_Work_Total" },
+           { data: "HR_Salary" },
+           { data: "HR_Work_No_Gain" } //hr is not this column
+       ],
+   } );
+}
+
+var table_n = function(){
+    table = $('#data_table').DataTable( {
+       ajax: url_notice,
+       select: true,
+       columns: [
+        { data: "Target" },
+        { data: "Title" },
+        { data: "Content" },
+        { data: "UpdateTime" } 
+       ],
+   } );
+}
+
+//var Name_List = ""
 var get_name_list = function(identity){
     let url = ""
     switch (identity){
@@ -602,9 +465,17 @@ var get_name_list = function(identity){
             console.log( "success" );
       })
         .done(function() {
-            Name_List = JSON.parse(jqxhr.responseText).data
-            console.log( JSON.parse(jqxhr.responseText).data);
-            
+            switch (identity){
+                case "student":
+                    List_student  = JSON.parse(jqxhr.responseText).data
+                    break;
+                case "teacher":
+                    List_teacher = JSON.parse(jqxhr.responseText).data
+                    break;
+                case "assistant":
+                    List_assistant = JSON.parse(jqxhr.responseText).data
+                    break;
+            }
             console.log( "second success" );
         })
         .fail(function() {
@@ -627,28 +498,46 @@ switch (page_now){
     case "/members/students":
         table_m_s()
         $(".members").addClass("active");
-        field_name = "Name"
+        not_allow_edit_field = "Name"
         break;
     case "/members/teachers":
         table_m_t()
         $(".members").addClass("active");
-        field_name = "Name"
+        not_allow_edit_field = "Name"
         break;
     case "/members/assistants":
         table_m_a()
         $(".members").addClass("active");
-        field_name = "Name"
+        not_allow_edit_field = "Name"
         break;
     case "/classes":
         table_c()
         $(".classes").addClass("active");
-        field_name = "Class"
+        not_allow_edit_field = "Class"
         break;
-    case "/accounts":
-    /*** */
-        table_a()
+    case "/accounts/students":
+        table_a_s()
         $(".accounts").addClass("active");
-        field_name = "Class"
+        not_allow_edit_field = "Student"
+        break;
+    case "/accounts/teachers":
+        table_a_t()
+        $(".accounts").addClass("active");
+        not_allow_edit_field = "Teacher"
+        break;
+    case "/accounts/assistants":
+        table_a_a()
+        $(".accounts").addClass("active");
+        not_allow_edit_field = "Assistant"
+        break;
+    case "/notices":
+        table_n()
+        $(".notices").addClass("active");
+        not_allow_edit_field = "Title"
+        break;
+    case "/calendar":
+        $(".notices").addClass("active");
+        //not_allow_edit_field = "Class"
         break;
 
         
@@ -687,62 +576,41 @@ setTimeout(function(){
         }
     } );
     
-    //add new (form function)
-     //teacher
-    $("#select_classes").click(function(){
-        let val_classes = $("#classes_output").val()
-        let new_class = $(this).val()
-        exist = val_classes.split(new_class)
-        if (exist.length > 1){
-            //remove existed option
-            let exist_con = val_classes.split(new_class+",")
-            if (exist_con.length > 1){
-                $("#classes_output").val(exist_con[0] +  exist_con[1] )
-            }else{
-                let exist_con = val_classes.split("," + new_class)
-                if (exist_con.length > 1){
-                    $("#classes_output").val(exist_con[0])
-                }else{
-                    $("#classes_output").val("")
-                }
-            }
-        }else{
-            //add new option
-            if (val_classes == "") val_classes = ""
-            else val_classes = val_classes + ","
-            $("#classes_output").val(val_classes +  new_class)
-        }
-        
-    })
+    
 
     $('button[type="button"]').click( function (domObj) {
         //console.log($this.attr("class"))
-        console.log($(this).attr("class"))
         let className = $(this).attr("class")
         let pathName = window.location.pathname
-       
         selected_row_num = table.rows('.selected').data().length
         if (className.split("update").length > 1   ){
             button_click_name = "update"
+            console.log(1)
             assign_update_form()
         }else if(className.split("delete").length > 1){
             button_click_name = "delete"
+            let msg = "Do you want to delete "
+            $(".modal_confirm_body").html(msg + get_selected_names() + " ?")
+          
+           // delete_records()
+        }else if(className.split("confirm_btn").length > 1){
+            button_click_name = "confirm_btn"
+            console.log("button_click_name")
+            console.log(button_click_name)
             delete_records()
-        }else if(className.split("add_new").length > 1){
-            button_click_name = "add_new"
-           
-            
-        }else if(className.split("save").length > 1){
-            
-            save_pre()
-            
+            clear_form()
+
         }
-            console.log(5)
+        else if(className.split("add_new").length > 1){
+            button_click_name = "add_new"
+        }else if(className.split("save").length > 1){
+            save_pre()
+        }
+        console.log( className )
+        console.log( table.rows('.selected').data() )
         console.log( table.rows('.selected').data().length +' row(s) selected' );
     } );
-
-
-    
+  
 },1400)
 
 
@@ -752,34 +620,63 @@ setTimeout(function(){
 //   $(this).parent().addClass("active");
 // });
 
-$(".buttons-edit").click(function(){
-    editor_field = editor.field(field_name);
-    editor_field.disable();
-    check_select_record_num = editor.field(field_name).s.multiValues
-    check_select_record_num = Object.keys(check_select_record_num).length
-    if(check_select_record_num > 1){
-        $(".DTED_Lightbox_Close").click()
-        alert("Edit function just allows one record.")
-    }
-    switch (page_now){
-        case "/classes":
-            $('#DTE_Field_Time_HR').timepicker();
-            break;
-    }
+// $(".buttons-edit").click(function(){
+//     editor_field = editor.field(not_allow_edit_field);
+//     editor_field.disable();
+//     check_select_record_num = editor.field(not_allow_edit_field).s.multiValues
+//     check_select_record_num = Object.keys(check_select_record_num).length
+//     if(check_select_record_num > 1){
+//         $(".DTED_Lightbox_Close").click()
+//         alert("Edit function just allows one record.")
+//     }
+//     switch (page_now){
+//         case "/classes":
+//             $('#DTE_Field_Time_HR').timepicker();
+//             break;
+//     }
    
-})
+// })
 
-$(".buttons-create").click(function(){
-    editor_field = editor.field(field_name);
-    editor_field.enable();
+$(".add_new").click(function(){
+    // editor_field = editor.field(not_allow_edit_field);
+    // editor_field.enable();
     switch (page_now){
         case "/classes":
-            $('#DTE_Field_Time_HR').timepicker();
-            get_name_list("student")
+            $('#join_date').timepicker();
+            console.log("time")
+            var res_teachers = ""
+            get_name_list("teacher") 
+             //====select teacher
             setTimeout( function () {
-                $("#DTE_Field_Students").val(Name_List)
-            }, 2000 );
-           
+                let teachers = List_teacher.split(",")
+                let str_option = ""
+                for (let i in teachers){
+                    str_option += `<option value="`+teachers[i]+`">` + teachers[i] + `</option>`
+                }
+                $("#select_teachers").html(str_option)
+                setTimeout( function () {
+                    $("#select_teachers").click(function(){
+                        return select_options($(this).attr('id'))
+                    })
+                }, 1000 );
+               
+            }, 1000 );
+             //====select student
+            get_name_list("student") 
+            setTimeout( function () {
+                let students = List_student.split(",")
+                let str_option = ""
+                for (let i in students){
+                    str_option += `<option value="`+students[i]+`">` + students[i] + `</option>`
+                }
+                $("#select_students").html(str_option)
+                setTimeout( function () {
+                    $("#select_students").click(function(){
+                        return select_options($(this).attr('id'))
+                    })
+                }, 1000 );
+               
+            }, 1000 );
             break;
     }
 })

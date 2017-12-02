@@ -11,6 +11,97 @@
 <script src="/js/data.js"></script>
 <main class="col-sm-10 ml-sm-auto col-md-12 pt-3 pl-3" role="main">
 <h1>Classes</h1>
+<div id="modal_dialog" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modal_dialogLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modal_dialogLabel">Add A New Ａssistant</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+                <form class="bd-example">
+                        <fieldset>
+                          <legend></legend>
+                      
+                          <p class="row">
+                              <label class="col-5" for="input_class">Class Name</label>
+                              <input class="col-6" type="text" id="input_class" placeholder="ex: 英文假日早班">
+                          </p>
+                          <p class="row">
+                              <label class="col-5" for="input_ccode">Class Code</label>
+                              <input class="col-6" type="text" id="input_ccode" placeholder="ex: eng-sun-morning-1">
+                          </p>
+                          <p class="row">
+                            <label class="col-5" for="input_type">Class Type</label>
+                            <input class="col-6" id="input_type" rows="3" placeholder="ex: english or japanese ..."></input>
+                          </p>
+                          <p class="row"> 
+                              <label class="col-5" for="input_day">Day</label>
+                              <input class="col-6" type="text" id="input_day" placeholder="ex: Saturday">
+                          </p>
+                          <p class="row">
+                              <label class="col-5" for="input_time">Time</label>
+                              <input class="col-6" type="email" id="input_time" placeholder="ex: 1300">
+                          </p>
+                          <p class="row">
+                            <label class="col-5" for="input_class_duration">Class Duration(hr)</label>
+                            <input class="col-6" type="email" id="input_class_duration" placeholder="ex: 1.5">
+                        </p>
+                          <p class="row">
+                            <label class="col-5" for="join_date">Join Date</label>
+                            <input class="col-6" type="date" id="join_date">
+                          </p>
+                          <p class="row">
+                                <label class="col-5" for="select_teachers">Teacher</label>
+                                <select class="col-6" id="select_teachers" multiple="multiple">
+                                </select>
+                         </p>
+                         <p class="row">
+                          <label class="col-5" for="teacher_output">Teacher : </label>
+                          <output class="col-6"  id="teacher_output"></output>
+                        </p>
+ 
+                        <p class="row">
+                            <label class="col-5" for="select_students">Students</label>
+                            <select class="col-6" id="select_students" multiple="multiple">
+                            </select>
+                        </p>
+                        <p class="row">
+                          <label class="col-5" for="student_output">Students : </label>
+                          <output class="col-6"  id="student_output"></output>
+                        </p>
+                        <p class="row">
+                            <label class="col-5" for="input_cost">Cost (per one class and one student)</label>
+                            <input class="col-6" type="number" id="input_cost" rows="3"  placeholder="700">
+                        </p>
+                        <p class="row">
+                            <label class="col-5" for="input_payment">Periodical Payment (times of class)</label>
+                            <input class="col-6" type="number" id="input_payment" rows="3"  placeholder="8">
+                        </p>
+                        </fieldset>
+                      </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary save_teacher">Save</button>
+        </div>
+      </div>
+    </div>
+</div>
+    <div class="bd">
+        <button type="button" class="add_new btn btn-primary float-right" data-toggle="modal" data-target="#modal_dialog">
+          ADD NEW
+        </button>
+        <button type="button" class="update btn btn-outline-secondary float-right" data-toggle="modal" data-target="#modal_dialog" disabled>
+          UPDATE
+        </button>
+        <button type="button" class="delete btn btn-outline-secondary float-right" data-toggle="modal" data-target="#modal_confirm" disabled>
+          DELETE
+        </button>
+    </div>
+
       <table id="data_table" class="hover row-border" cellspacing="0" width="100%">
           <thead>
               <tr>
@@ -24,7 +115,7 @@
                   <th>Type</th>
                   <th>Students</th>
                   <th>Cost</th>
-                  <th>Charge Times</th>
+                  <th>Periodical Payment</th>
               </tr>
           </thead>
           <tfoot>
@@ -40,14 +131,32 @@
                   <th>Type</th>
                   <th>Students</th>
                   <th>Cost</th>
-                  <th>Charge Times</th>
+                  <th>Periodical Payment</th>
               </tr>
           </tfoot>
       </table>
       <!-- <div class="timepicker"></div> -->
      
 </main>
-      
+<div id="modal_confirm" class="modal fade" tabindex="1" role="dialog" aria-labelledby="modal_dialogLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modal_dialogLabel">{{ confirm_del_title "" }}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body modal_confirm_body">
+              {{ confirm_del_body "" }}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary confirm_btn">{{ confirm_del_submit ""}}</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
       
 

@@ -1,8 +1,51 @@
+<script src="/js/datatables.min.js"></script>
+<script src="/js/data.js"></script>
 <main class="col-sm-10 ml-sm-auto col-md-12 pt-3 pl-3" role="main">
         <h1>Teachers</h1>
-    
-        <section class="row text-center placeholders">
-          <div class="col-6 col-sm-3 placeholder">
-        
+        <div class="bd-example bd-example-tabs" role="tabpanel">
+          <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" id="will_pay-tab" data-toggle="tab" href="#will_pay" role="tab" aria-controls="will_pay" aria-expanded="true">Will Pay</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="done-tab" data-toggle="tab" href="#done" role="tab" aria-controls="done" aria-expanded="false">Done List</a>
+            </li>
+          </ul>
+         
+          <div class="tab-content" id="myTabContent">
+            <div role="tabpanel" class="tab-pane fade active show" id="will_pay" aria-labelledby="will_pay-tab" aria-expanded="true">
+                <div class="bd">
+                    <button type="button" class="send_mail btn btn-primary float-right" data-toggle="modal" data-target="#modal_dialog">
+                      Send Notice Mail
+                    </button>
+                    <button type="button" class="throw_done btn btn-primary float-right" data-toggle="modal" data-target="#modal_dialog">
+                      Throw to Done List
+                    </button>
+                </div>
+              <table id="data_table" class="hover row-border" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Class</th>
+                      <th>Total Hours</th>
+                      <th>Salary per HR</th>
+                      <th>Accounts Payable($)</th>       
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                      <th>Name</th>
+                      <th>Class</th>
+                      <th>Total Hours</th>
+                      <th>Salary per HR</th>
+                      <th>Accounts Payable($)</th>   
+                    </tr>
+                </tfoot>
+            </table>
+            </div>
+            <div class="tab-pane fade" id="done" role="tabpanel" aria-labelledby="done-tab" aria-expanded="false">
+              <p>Food truck fixie locavore, accusamus mcsweeney's marfa nulla single-origin coffee squid. Exercitation +1 labore velit, blog sartorial PBR leggings next level wes anderson artisan four loko farm-to-table craft beer twee. Qui photo booth letterpress, commodo enim craft beer mlkshk aliquip jean shorts ullamco ad vinyl cillum PBR. Homo nostrud organic, assumenda labore aesthetic magna delectus mollit. Keytar helvetica VHS salvia yr, vero magna velit sapiente labore stumptown. Vegan fanny pack odio cillum wes anderson 8-bit, sustainable jean shorts beard ut DIY ethical culpa terry richardson biodiesel. Art party scenester stumptown, tumblr butcher vero sint qui sapiente accusamus tattooed echo park.</p>
+            </div>
+          </div>
         </div>
       </main>

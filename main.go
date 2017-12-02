@@ -7,15 +7,36 @@ import (
 type page struct {
 	PTitle     string
 	Javascript string
+	Something  string
+	SomeNumber string
 }
 
 func main() {
+	// vars := map[string]interface{}{
+	// 	"something":  "some value",
+	// 	"someNumber": 23,
+	// }
+
 	app := iris.New()
 	tmpl := iris.HTML("./templates", ".html")
 	// tmpl.Layout("layouts/layout.html")
 	tmpl.Layout("layouts/main_layout.html")
+	// t, _ := tmpl.Templates.Parse("page_members_students.html")
+	// t.Execute(io.Writer, vars)
 	tmpl.AddFunc("greet", func(s string) string {
 		return "Greetings " + s + "!"
+	})
+	tmpl.AddFunc("greetee", func(s string) string {
+		return "Greetings " + s + "!"
+	})
+	tmpl.AddFunc("confirm_del_title", func(s string) string {
+		return "Delete confirm"
+	})
+	tmpl.AddFunc("confirm_del_body", func(s string) string {
+		return ""
+	})
+	tmpl.AddFunc("confirm_del_submit", func(s string) string {
+		return "Delete"
 	})
 
 	app.RegisterView(tmpl)
@@ -45,10 +66,34 @@ func main() {
 	app.Get("/data_teacher_name_list", writePathHandler)
 	app.Get("/data_assistant_name_list", writePathHandler)
 
+	// app.Get("/get_teachers", writePathHandler)
+	// app.Get("/get_students", writePathHandler)
+
 	app.Get("/data_class", writePathHandler)
 	app.Post("/post_data_class", post_class_handler)
 	app.Put("/post_data_class_edit", post_class_handler)
 	app.Put("/post_data_class_remove", post_class_handler)
+
+	app.Get("/data_account_student", writePathHandler)            //view
+	app.Post("/post_account_student", post_account_handler)       //add
+	app.Put("/post_account_student_edit", post_account_handler)   //edit
+	app.Put("/post_account_student_remove", post_account_handler) //remove
+
+	app.Get("/data_account_teacher", writePathHandler)            //view
+	app.Post("/post_account_teacher", post_account_handler)       //add
+	app.Put("/post_account_teacher_edit", post_account_handler)   //edit
+	app.Put("/post_account_teacher_remove", post_account_handler) //remove
+
+	app.Get("/data_account_assistant", writePathHandler)            //view
+	app.Post("/post_account_assistant", post_account_handler)       //add
+	app.Put("/post_account_assistant_edit", post_account_handler)   //edit
+	app.Put("/post_account_assistant_remove", post_account_handler) //remove
+
+	app.Get("/send_mail", writePathHandler)
+	app.Get("/data_notice", writePathHandler)            //view
+	app.Post("/post_notice", post_account_handler)       //add
+	app.Put("/post_notice_edit", post_account_handler)   //edit
+	app.Put("/post_notice_remove", post_account_handler) //remove
 
 	app.Get("/", func(ctx iris.Context) {
 		ctx.ViewData("", page{PTitle: "HOME-Victory"})
@@ -64,6 +109,13 @@ func main() {
 			ctx.Writef(err.Error())
 		}
 	})
+	app.Get("/mailer", func(ctx iris.Context) {
+		ctx.ViewData("", page{PTitle: "Mailer-Victory"})
+		if err := ctx.View("page_gmail.html"); err != nil {
+			ctx.StatusCode(iris.StatusInternalServerError)
+			ctx.Writef(err.Error())
+		}
+	})
 	// set a layout for a party, .Layout should be BEFORE any Get or other Handle party's method
 	p_members := app.Party("/members").Layout("layouts/main_layout.html")
 	{ // both of these will use the layouts/mylayout.html as their layout.
@@ -71,7 +123,8 @@ func main() {
 			//ctx.View("page1.html")
 			ctx.ViewData("", page{
 				PTitle: "Students-Members-Victory",
-				//Javascript: " <script src=\"/js/data.js\"></script>",
+				// Something:  "some value",
+				// SomeNumber: "23",
 			})
 			if err := ctx.View("page_members_students.html"); err != nil {
 				ctx.StatusCode(iris.StatusInternalServerError)
@@ -80,7 +133,16 @@ func main() {
 		})
 		p_members.Get("/teachers", func(ctx iris.Context) {
 			//ctx.View("page1.html")
-			ctx.ViewData("", page{PTitle: "Teachers-Members-Victory"})
+
+			ctx.ViewData("", page{
+				PTitle: "Teachers-Members-Victory",
+				// modal_title:  "Delete Confirm",
+				// modal_body:   "Do you want to delete? ",
+				// modal_submit: "Delete",
+			})
+			// ctx.ViewDate("", page{modal_title: "Delete Confirm"})
+			// ctx.ViewDate("", page{modal_body: "Do you want to delete? "})
+			// ctx.ViewDate("", page{modal_submit: "Delete"})
 			if err := ctx.View("page_members_teachers.html"); err != nil {
 				ctx.StatusCode(iris.StatusInternalServerError)
 				ctx.Writef(err.Error())
