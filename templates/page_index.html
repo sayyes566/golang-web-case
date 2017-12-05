@@ -1,0 +1,173 @@
+<script src="/js/datatables.min.js"></script>
+<script type="text/javascript" src="/js/jquery.timepicker.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/css/jquery.timepicker.min.css" />
+<script src="/js/data.js"></script>
+<script src="/js/page.js"></script>
+<style>
+   .label_indent {
+    display: block;
+    padding-left: 1.3em;
+    text-indent: 0.7em;
+}
+.width-middlen{
+  width:300px;
+}
+.border_green{
+  border:1px green solid;
+}
+.vertical-align {
+    display: flex;
+    align-items: center;
+}
+/* .margin_right{
+ // margin-right: 5px;
+}
+.width_90{
+  width:90%;
+} */
+
+</style>
+<script type="text/javascript">
+  $(function () {
+    $('#datetimepicker3').timepicker();
+  //     $('#datetimepicker3').datetimepicker({
+  //         format: 'LT'
+  //     });
+   });
+   $( "#datepicker" ).datepicker();
+</script>
+<main class="col-sm-10 ml-sm-auto col-md-12 pt-3 pl-3" role="main">
+  <div class="row">
+    <div class="col-2">
+        <h2>今天</h2>
+    </div>
+    <div class="col-6">
+        <h2 class="date_now"></h2>
+    </div>
+    <div class="col-4">
+        <div class="btn-group float-right">
+            <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                說明
+            </button>
+            <div class="dropdown-menu dropdown-menu-right width-middlen">
+              <p>課程：</p>
+              <p>＠開課狀態：休假或是調課：代表課程往後移，僅需設定下次上課日期</p>
+              <p>出席：</p>
+              <p> ＃老師：</p>
+              <p>  ＠老師有出席上課，則有算薪水，未到則課程須延後，算是調課．請代課則自行支付該老師薪水．</p>
+              <p> ＃學生：</p>
+              <p>  ＠學生未到通常代表要補課，直接選擇補課，並備註上課日期．未到可表示這次不上課不補課．如學生要停課可到課程選單移除學生姓名．</p>
+            </div>
+          </div>
+
+        <!-- <div class="btn-info float-right">
+            
+        </div> -->
+    </div>
+    
+    
+  </div>
+  <div class="row ">
+    <div class="col-2 border_green vertical-align">
+        <h4 class="class_time ">11:00 ~ 12:00</h4>
+    </div>
+    <div class="col-9 border_green" >
+        <fieldset >
+        <legend class="class_name">日文廢話班:</legend>
+        <div class="form-inline" >
+          <label class=" mr-sm-2" for="class_name">課程</label> 
+              <p class="form-control  mb-2 mr-sm-2 mb-sm-0" id="class_hr" >第8期</p>
+              <label class=" mb-2 mr-sm-2 mb-sm-0" for="inlineFormInputGroup">
+                  <div class="input-group-addon bg-success">開課狀態</div>
+                  <select class="form-control">
+                      <option value="none" class="bg-success">正常上課</option>
+                      <option value="none" class="bg-danger">休假</option>
+                      <option value="none" class="bg-warning">調課</option>
+                    </select>
+                  </label>
+          
+        </div><!--   form-inline -->
+        <div class="form-inline" >
+        <label class="  mr-sm-2 label_indent" for="class_hr">  今日預計上</label>
+            <p class="form-control  mb-2 mr-sm-2 mb-sm-0" id="class_hr" >2小時</p>
+            <label class=" mr-sm-2" for="class_hr">這期已上
+            <p class="form-control mb-2 mr-sm-2 mb-sm-0" id="class_hr" >22小時</p></label>
+            <label class="mr-sm-2" for="class_hr">預計上完</label>
+            <p class="form-control mb-2 mr-sm-2 mb-sm-0" id="class_hr" >40小時</p>
+            <label class="mr-sm-2" for="class_hr">後收下期費用和支付老師這期薪資</label>
+        </div><!--   form-inline -->
+        <div class="form-inline" >
+            <label class="mr-sm-2 label_indent" for="inlineFormInput">  下次上課日期</label>
+            <!-- <div class=' input-group date' id='datetimepicker3'>
+                <input type='text' class="form-control" />
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-time"></span>
+                </span>
+            </div> -->
+            <div class="input-group-addon bg-success">#</div>
+            <input id="date" type="date" class="form-control mb-2 mr-sm-2 mb-sm-0" />
+            <label class="mr-sm-2" for="inlineFormInput">時間</label>
+            <div class="input-group-addon bg-success">#</div>
+            <input id="time" type="time" class="form-control mb-2 mr-sm-2 mb-sm-0" /><label class="mr-sm-2" for="inlineFormInput">開始，共</label>
+            <div class="input-group-addon bg-success">#</div>
+            <input type="number" name="points" min="0" max="10"  step="0.5" class="form-control mb-2 mr-sm-2 mb-sm-0"  />
+            <label class="mr-sm-2" for="inlineFormInput">小時</label>
+        </div><!--   form-inline -->    
+        <div class="form-inline" >
+            <label class="mr-sm-2" for="inlineFormInput">老師</label>
+            <p class="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput" >Jane Doe</p>
+            <label class=" mb-2 mr-sm-2 mb-sm-0" for="inlineFormInputGroup">
+                <div class="input-group-addon bg-success">出席狀態</div>
+                <select class="form-control">
+                    <option value="none" class="bg-success">到</option>
+                    <option value="none" class="bg-danger">未到</option>
+                    <option value="none" class="bg-warning">請代課</option>
+                  </select>
+                </label>
+            <label class="mr-sm-2" for="class_hr">(未到不支薪)，</label>
+            <label class="mr-sm-2" for="class_hr">這期已上</label>
+            <p class="form-control mb-2 mr-sm-2 mb-sm-0" id="class_hr" >30小時</p>
+            <!-- <label class="mr-sm-2" for="class_hr">預計上完</label>
+            <p class="form-control mb-2 mr-sm-2 mb-sm-0" id="class_hr" >32小時</p>
+            <label class="mr-sm-2" for="class_hr">支薪</label> -->
+        </div><!--   form-inline -->
+        <div class="form-inline" >
+            <label class="mr-sm-2" for="inlineFormInput">學生</label>
+            <p class="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput" >Jane Doe</p>
+            <label class=" mb-2 mr-sm-2 mb-sm-0" for="inlineFormInputGroup">
+                <div class="input-group-addon bg-success">出席狀態</div>
+                <select class="form-control">
+                    <option value="none" class="bg-success">到</option>
+                    <option value="none" class="bg-danger">未到</option>
+                    <option value="none" class="bg-warning">之後補課</option>
+                  </select>
+                </label>
+                <label class="mr-sm-2" for="class_hr">(未到不補課)，</label>
+            <label class="mr-sm-2" for="class_hr">這期已上</label>
+            <p class="form-control mb-2 mr-sm-2 mb-sm-0" id="class_hr" >30小時</p>
+            <!-- <label class="mr-sm-2" for="class_hr">預計上完</label>
+            <p class="form-control mb-2 mr-sm-2 mb-sm-0" id="class_hr" >32小時</p>
+            <label class="mr-sm-2" for="class_hr">付下學期薪水</label> -->
+        </div><!--   form-inline -->
+
+             
+          
+            <div class="form-inline float-right" >
+            <label class="mr-sm-2" for="class_hr">助理</label>
+            <p class="form-control mb-2 mr-sm-2 mb-sm-0" id="class_hr" >Ｍいけ</p>
+            <button type="button" class="btn btn-info">
+                確定
+            </button>
+            </div>
+          </div>
+        </fieldset>
+    </div>
+    
+  </div>
+
+
+
+  </main>
+
+
+  

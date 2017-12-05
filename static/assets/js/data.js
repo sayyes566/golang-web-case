@@ -30,6 +30,7 @@ var url_post_notice_remove_remove = "/post_notice_remove"
 var List_teacher;
 var List_student;
 var List_assistant;
+var List_class;
 
 
 //var selected_datas = ''
@@ -475,6 +476,7 @@ var get_name_list = function(identity){
                 case "assistant":
                     List_assistant = JSON.parse(jqxhr.responseText).data
                     break;
+                   
             }
             console.log( "second success" );
         })
@@ -642,7 +644,7 @@ $(".add_new").click(function(){
     // editor_field.enable();
     switch (page_now){
         case "/classes":
-            $('#join_date').timepicker();
+           // $('#join_date').timepicker();
             console.log("time")
             var res_teachers = ""
             get_name_list("teacher") 
@@ -672,6 +674,23 @@ $(".add_new").click(function(){
                 $("#select_students").html(str_option)
                 setTimeout( function () {
                     $("#select_students").click(function(){
+                        return select_options($(this).attr('id'))
+                    })
+                }, 1000 );
+               
+            }, 1000 );
+            break;
+        case "/members/students":
+            get_name_list("class") 
+            setTimeout( function () {
+                let teachers = List_teacher.split(",")
+                let str_option = ""
+                for (let i in teachers){
+                    str_option += `<option value="`+teachers[i]+`">` + teachers[i] + `</option>`
+                }
+                $("#select_teachers").html(str_option)
+                setTimeout( function () {
+                    $("#select_teachers").click(function(){
                         return select_options($(this).attr('id'))
                     })
                 }, 1000 );

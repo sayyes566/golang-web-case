@@ -16,9 +16,9 @@ func writePathHandler(ctx iris.Context) {
 	page_now := ctx.Path()
 	//fmt.Println(page_now)
 	switch page_now {
-	case "/send_mail":
-		res := send_mail()
-		ctx.JSON(res)
+	// case "/send_mail":
+	// 	res := send_mail()
+	// 	ctx.JSON(res)
 	case "/data_student":
 		res := person_find_list("Student")
 		ctx.Writef("{\"data\": ")

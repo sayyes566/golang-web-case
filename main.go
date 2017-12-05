@@ -1,7 +1,10 @@
 package main
 
 import (
+	"time"
+
 	"github.com/kataras/iris"
+	session "github.com/kataras/iris/sessions"
 )
 
 type page struct {
@@ -9,6 +12,29 @@ type page struct {
 	Javascript string
 	Something  string
 	SomeNumber string
+}
+
+type page_classes struct {
+	Full_Name string
+}
+
+var sess = session.New(session.Config{
+	Cookie:  ".cookiesession.id",
+	Expires: time.Minute,
+})
+
+//Set and Get
+func h(ctx iris.Context) {
+	session := sess.Start(ctx)
+	session.Set("key", "value")
+
+	value := session.GetString("key")
+	if value == "" {
+		ctx.WriteString("NOT_OK")
+		return
+	}
+
+	ctx.WriteString(value)
 }
 
 func main() {
@@ -36,6 +62,35 @@ func main() {
 		return ""
 	})
 	tmpl.AddFunc("confirm_del_submit", func(s string) string {
+		return "Delete"
+	})
+
+	tmpl.AddFunc("classes", func(word string) string {
+		switch word {
+		case "Full Name":
+			return "課程名稱"
+		case "Day":
+			return "上課星期"
+		case "Time":
+			return "上課時間"
+		case "Duration":
+			return "上課時數(小時)"
+		case "Join Date":
+			return "課程成立日"
+		case "Teacher":
+			return "老師"
+		case "Type":
+			return "課程類型"
+		case "Students":
+			return "學生"
+		case "Cost":
+			return "課程價格(一期ㄧ人)"
+		case "Periodical Payment":
+			return "下次收費時間"
+		case "Auto Calculate":
+			return "自動更新"
+
+		}
 		return "Delete"
 	})
 
@@ -95,15 +150,40 @@ func main() {
 	app.Put("/post_notice_edit", post_account_handler)   //edit
 	app.Put("/post_notice_remove", post_account_handler) //remove
 
+	app.Get("/login", func(ctx iris.Context) {
+
+		ctx.ViewLayout(iris.NoLayout)
+		ctx.ViewData("", page{PTitle: "Login-Victory"})
+		if err := ctx.View("index.html"); err != nil {
+			ctx.StatusCode(iris.StatusInternalServerError)
+			ctx.Writef(err.Error())
+		}
+
+	})
+	// app.Get("/logout", func(ctx iris.Context) {
+	// 	// removes all entries
+	// 	sess.Start(ctx).Clear()
+	// 	ctx.Redirect("/login")
+	// })
+
 	app.Get("/", func(ctx iris.Context) {
+		session := sess.Start(ctx)
+		session.Set("key", "value")
+
 		ctx.ViewData("", page{PTitle: "HOME-Victory"})
-		if err := ctx.View("main_content.html"); err != nil {
+		if err := ctx.View("page_index.html"); err != nil {
 			ctx.StatusCode(iris.StatusInternalServerError)
 			ctx.Writef(err.Error())
 		}
 	})
 	app.Get("/calendar", func(ctx iris.Context) {
-		ctx.ViewData("", page{PTitle: "Calendar-Victory"})
+		session := sess.Start(ctx)
+		value := session.GetString("key")
+		// if value == "" {
+		// 	ctx.WriteString("NOT_OK")
+		// }
+
+		ctx.ViewData("", page{PTitle: "Calendar-Victory" + value})
 		if err := ctx.View("page_calendar.html"); err != nil {
 			ctx.StatusCode(iris.StatusInternalServerError)
 			ctx.Writef(err.Error())

@@ -40,12 +40,12 @@
     <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <a class="navbar-brand" href="#">Victory</a>
+    <a class="navbar-brand" href="/">Victory</a>
 
     <div class="collapse navbar-collapse" id="navbarsExampleDefault">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item home active">
-          <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item calander ">
             <a class="nav-link" href="/calendar">Calendar</a>
@@ -74,8 +74,39 @@
               </li>
       </ul>
       <form class="form-inline my-2 my-lg-0">
-        <input class="form-control mr-sm-2" type="text" placeholder="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+          <div class="btn-group float-right">
+             <p class="form-control mb-2 mr-sm-2 mb-sm-0" id="class_hr" >Hi, 助理請打卡</p>
+              <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Ｍいけ
+              </button>
+              <div class="dropdown-menu dropdown-menu-right width-middlen">
+                  <div class="row">
+                      <label class="mr-sm-2 col-4" for="class_hr">狀態</label>
+                      <button class="form-control  mb-2 mr-sm-2 mb-sm-0" id="class_hr" >上班中</button>
+                      <button class="form-control btn-danger mb-2 mr-sm-2 mb-sm-0" id="class_hr" >下班打卡</button>
+                  </div>
+                  <div class="row">
+                      <label class="mr-sm-2 col-4" for="class_hr">上班時間</label>
+                      <p class="form-control col-7 mb-2 mr-sm-2 mb-sm-0" id="class_hr" >11:20</p>
+                  </div>
+                  <div class="row">
+                      <label class="mr-sm-2 col-4" for="class_hr">下班時間</label>
+                      <p class="form-control  col-7 mb-2 mr-sm-2 mb-sm-0" id="class_hr" >...</p>
+                  </div>
+                  <div class="row">
+                      <label class="mr-sm-2 col-4" for="class_hr">總累計</label>
+                      <p class="form-control col-7 mb-2 mr-sm-2 mb-sm-0" id="class_hr" >20</p>
+                  </div>
+                  <div class="row">
+                      <label class="mr-sm-2 col-4" for="class_hr">今日累計</label>
+                      <p class="form-control col-7 mb-2 mr-sm-2 mb-sm-0" id="class_hr" >0</p>
+                  </div>
+                  <div class="row">
+                      <label class="mr-sm-2 col-4" for="class_hr"></label>
+                      <button class="btn-info col-7 mb-2 mr-sm-2 mb-sm-0" for="class_hr">登出</button>
+                     
+                  </div>
+              </div>
       </form>
     </div>
   </nav>

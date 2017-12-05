@@ -27,6 +27,7 @@ var (
 	con_ip      = "127.0.0.1"
 	con_db      = "test"
 	table_count = 0
+	con_layout  = "Mon Jan _2 15:04:05 2006"
 )
 
 func index_set(c *mgo.Collection, arr_keys []string, Unique, DropDups, Background, Sparse bool) error {

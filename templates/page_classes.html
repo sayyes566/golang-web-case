@@ -1,9 +1,9 @@
 
 
-
-<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="/js/datatables.min.js"></script>
+<!-- <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/select/1.2.3/js/dataTables.select.min.js"></script>
+<script src="https://cdn.datatables.net/select/1.2.3/js/dataTables.select.min.js"></script> -->
 <!--script src="/js/dataTables.editor.min.js"></script-->
 <script type="text/javascript" src="/js/jquery.timepicker.min.js"></script>
 <link rel="stylesheet" type="text/css" href="/css/jquery.timepicker.min.css" />
@@ -29,12 +29,16 @@
                               <label class="col-5" for="input_class">Class Name</label>
                               <input class="col-6" type="text" id="input_class" placeholder="ex: 英文假日早班">
                           </p>
-                          <p class="row">
+                          <!-- <p class="row">
                               <label class="col-5" for="input_ccode">Class Code</label>
                               <input class="col-6" type="text" id="input_ccode" placeholder="ex: eng-sun-morning-1">
-                          </p>
+                          </p> -->
                           <p class="row">
                             <label class="col-5" for="input_type">Class Type</label>
+                            <input class="col-6" id="input_type" rows="3" placeholder="ex: english or japanese ..."></input>
+                          </p>
+                          <p class="row">
+                            <label class="col-5" for="input_type">Next Payment date</label>
                             <input class="col-6" id="input_type" rows="3" placeholder="ex: english or japanese ..."></input>
                           </p>
                           <p class="row"> 
@@ -47,7 +51,7 @@
                           </p>
                           <p class="row">
                             <label class="col-5" for="input_class_duration">Class Duration(hr)</label>
-                            <input class="col-6" type="email" id="input_class_duration" placeholder="ex: 1.5">
+                            <input class="col-6" type="number" id="input_class_duration" placeholder="ex: 1.5">
                         </p>
                           <p class="row">
                             <label class="col-5" for="join_date">Join Date</label>
@@ -105,17 +109,17 @@
       <table id="data_table" class="hover row-border" cellspacing="0" width="100%">
           <thead>
               <tr>
-                  <th>Full Name</th>
-                  <th>Class Code</th>
-                  <th>Day</th>
-                  <th>Time</th>
-                  <th>Duration</th>
-                  <th>Join Date</th>
-                  <th>Teacher</th>
-                  <th>Type</th>
-                  <th>Students</th>
-                  <th>Cost</th>
-                  <th>Periodical Payment</th>
+                  <th>{{classes "Full Name"}}</th>
+                  <th>{{classes "Class Code"}}</th>
+                  <th>{{classes "Day"}}</th>
+                  <th>{{classes "Time"}}</th>
+                  <th>{{classes "Duration"}}</th>
+                  <th>{{classes "Join Date"}}</th>
+                  <th>{{classes "Teacher"}}</th>
+                  <th>{{classes "Type"}}</th>
+                  <th>{{classes "Students"}}</th>
+                  <th>{{classes "Cost"}}</th>
+                  <th>{{classes "Periodical Payment"}}</th>
               </tr>
           </thead>
           <tfoot>
