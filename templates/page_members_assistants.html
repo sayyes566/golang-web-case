@@ -11,46 +11,55 @@
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="modal_dialogLabel">Add A New Ａssistant</h5>
+              <h5 class="modal-title" id="modal_dialogLabel">註冊一位新助理</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">×</span>
               </button>
             </div>
             <div class="modal-body">
-                    <form class="bd-example">
-                            <fieldset>
-                              <legend></legend>
-                          
-                              <p class="row">
-                                  <label class="col-5" for="input_assistant">Assistant Name</label>
-                                  <input class="col-6" type="text" id="input_assistant" placeholder="ex: 王大大">
-                              </p>
-                              <p class="row">
-                                  <label class="col-5" for="input_phone">Phone(home)</label>
-                                  <input class="col-6" type="text" id="input_phone" placeholder="ex: 021234567">
-                              </p>
-                              <p class="row"> 
-                                  <label class="col-5" for="input_cellphone">Cellphone</label>
-                                  <input class="col-6" type="text" id="input_cellphone" placeholder="ex: 0912345678">
-                              </p>
-                              <p class="row">
-                                  <label class="col-5" for="input_email">E-mail</label>
-                                  <input class="col-6" type="email" id="input_email" placeholder="ex: alice@gmail.com">
-                              </p>
-                              <p class="row">
-                                <label class="col-5" for="join_date">Join Time</label>
-                                <input class="col-6" type="date" id="join_date">
-                              </p>
-                              <p class="row">
-                                    <label class="col-5" for="input_salary">salary per hour</label>
-                                    <input class="col-6" type="text" id="input_salary" placeholder="700">
-                             </p>
-                             <p class="row">
-                                    <label class="col-5" for="textarea_note">Note</label>
-                                    <textarea class="col-6" id="textarea_note" rows="3"></textarea>
-                            </p>
-                            </fieldset>
-                          </form>
+                <form class="bd-example">
+                    <fieldset>
+                      <legend></legend>
+                    
+                      <p class="row">
+                        <label class="col-5" for="input_assistant">姓名</label>
+                        <input class="col-6" type="text" id="input_assistant" placeholder="ex: 王大名">
+                      </p>
+                      <p class="row">
+                        <label class="col-5" for="input_email">帳號 （電子信箱）</label>
+                        <input class="col-6" type="email" id="input_email" placeholder="ex: alice@gmail.com">
+                      </p>
+                      <p class="row">
+                        <label class="col-5" for="input_password">密碼</label>
+                        <input class="col-6" type="text" id="input_password" placeholder="ex: ******">
+                      </p>
+                      <p class="row">
+                        <label class="col-5" for="input_password_re">密碼(請再輸入一次)</label>
+                        <input class="col-6" type="text" id="input_password_re" placeholder="ex: ******">
+                      </p>
+                      <p class="row">
+                        <label class="col-5" for="input_phone">市內電話</label>
+                        <input class="col-6" type="text" id="input_phone" placeholder="ex: 021234567">
+                      </p>
+                      <p class="row"> 
+                        <label class="col-5" for="input_cellphone">手機號碼</label>
+                        <input class="col-6" type="text" id="input_cellphone" placeholder="ex: 0912345678">
+                      </p>
+                      
+                      <p class="row">
+                      <label class="col-5" for="join_date">工作第一天</label>
+                      <input class="col-6" type="date" id="join_date">
+                      </p>
+                      <p class="row">
+                        <label class="col-5" for="input_salary">時薪</label>
+                        <input class="col-6" type="text" id="input_salary" placeholder="700">
+                     </p>
+                     <p class="row">
+                        <label class="col-5" for="textarea_note">備註</label>
+                        <textarea class="col-6" id="textarea_note" rows="3"></textarea>
+                    </p>
+                    </fieldset>
+                    </form>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

@@ -12,6 +12,7 @@ https://console.developers.google.com/apis/credentials?project=api-project-66236
 https://developers.google.com/google-apps/calendar/v3/reference/events/insert#examples
 */
 import (
+	"crypto/md5"
 	"fmt"
 	"log"
 	"reflect"
@@ -148,6 +149,26 @@ func person_find_one(condition_identity string, sort_string string) Person {
 	return result
 }
 
+func person_find_login_person(username string, password string) Person {
+	c, session := mgo_connect(con_ip, con_db, "people")
+	defer session.Close()
+	//p := Person{}
+	//fmt.Println(reflect.TypeOf(p))
+	M := bson.M{"name": username, "password": password}
+	// Query One
+	fmt.Println(username)
+	fmt.Println(password)
+	result := Person{}
+	fmt.Println(result)
+	err := c.Find(M).One(&result) //Desc
+	fmt.Println(err)
+	if err != nil {
+		result.Uid = 0
+		return result
+	}
+	return result
+}
+
 func person_find_Last_Uid(sort_string string) Person {
 	c, session := mgo_connect(con_ip, con_db, "people")
 	defer session.Close()
@@ -190,6 +211,9 @@ func notice_find_last_id(sort_string string) Notice_Docs {
 	return result
 }
 
+/*=========================================
+				Find List
+=========================================*/
 func person_find_Name_List(identity string) string {
 	str_res := ""
 	c, session := mgo_connect(con_ip, con_db, "people")
@@ -204,13 +228,10 @@ func person_find_Name_List(identity string) string {
 		//fmt.Println(v.Name)
 		str_res += v.Name + ","
 	}
-	//fmt.Println(str_res[:len(str_res)-1])
+
 	return str_res[:len(str_res)-1]
 }
 
-/*=========================================
-				Find List
-=========================================*/
 func person_find_list(identity string) []Person {
 	c, session := mgo_connect(con_ip, con_db, "people")
 	defer session.Close()
@@ -622,11 +643,21 @@ func person_insert(s Person, identity string) string {
 	}
 
 	index_last += 1
+
+	fmt.Println("identity")
+	fmt.Println(identity)
+	if identity == "Assistant" && s.Password != "" {
+		s.Password = password_md5(s.Password)
+		fmt.Println(s.Password)
+	}
+	fmt.Println("People")
+	fmt.Println(s)
 	// fmt.Println(index_last)
 	err := c.Insert(
 		&Person{
 			Uid:                     index_last,
 			Name:                    s.Name,
+			Password:                s.Password,
 			Phone_Home:              s.Phone_Home,
 			Phone_Cell:              s.Phone_Cell,
 			EMAIL:                   s.EMAIL,
@@ -642,8 +673,10 @@ func person_insert(s Person, identity string) string {
 		})
 	if err != nil {
 		str_error := err.Error()
+		fmt.Println("===:")
+		fmt.Println(str_error)
 		if strings.Contains(str_error, "duplicate key") {
-			return ("Warning: Username has already been taken. Please input another Name! (ex: John11)")
+			return ("Warning: Username" + s.Name + " has already been taken. Please input another Name! (ex: John11)")
 		} else {
 			fmt.Println(str_error)
 			//log.Fatal("person_insert: " + str_error)
@@ -829,5 +862,35 @@ func fields_print(b Person, query_res []Person) {
 
 		}
 		j += 1
+	}
+}
+
+/*=========================================
+				LOGIN / REGISTRY
+=========================================*/
+func password_md5(password string) string {
+	data := []byte(password)
+	has := md5.Sum(data)
+	md5str := fmt.Sprintf("%x", has)
+	return md5str
+}
+
+func login_find(username string, password string) Person {
+	p := Person{}
+	fmt.Println("login_find")
+	fmt.Println(username)
+	fmt.Println(password_md5(password))
+	p = person_find_login_person(username, password_md5(password))
+	fmt.Println(p)
+
+	return p
+}
+
+func to_user_msg(permission string) string {
+
+	if permission == "助理" {
+		return "上班請打卡"
+	} else {
+		return "你好！"
 	}
 }

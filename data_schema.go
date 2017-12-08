@@ -16,7 +16,8 @@ type Person struct {
 	Phone_Home              string `json: "phone_home" bson:"phone_home"` // Nil
 	Phone_Cell              string `json: "phone_cell" bson:"phone_cell"` //Nil
 	EMAIL                   string `json: "email" bson:"email"`           // Nil
-	Identity                string `json: "identity" bson:"identity"`     // student/ teacher/ assistant
+	Password                string `json: "password" bson:"password"`
+	Identity                string `json: "identity" bson:"identity"` // student/ teacher/ assistant
 	Open_Date               string `json: "open_date" bson:"open_date"`
 	Classes                 string `json: "classes" bson:"classes"`     //[A,B..] or nil
 	Salary_HR_Int           int    `json: "salary_hr" bson:"salary_hr"` //[same as Salary table] for Teacher and Assistant only

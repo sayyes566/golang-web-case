@@ -15,7 +15,8 @@
 	<script src="/js/jquery-1.12.4.js"></script>
 	<link href="/css/bootstrap.min.css" rel="stylesheet">
 	<script src="/js/bootstrap.min.js"></script>
-
+	<script src="/js/data.js"></script>
+	<script src="/js/page.js"></script>
 </head>
 
 <body>
@@ -43,15 +44,80 @@
 			<div class="row"><label class="mr-sm-2 col-4" for="space"></label> </div>
 			
 		
-					<button class="mr-sm-8 col-8 login_btn" type="submit">登入</button>
+					<button class="mr-sm-8 col-8 login_btn" type="button">登入</button>
 				 
-			
+
 			
 			<br/>
 			<a href="#"><p class="small">忘記密碼?</p></a>
-			<a href="#"><p class="registry">註冊</p></a>
+			<!-- <a href="#"><p class="registry add_new btn btn-primary float-right" >註冊</p></a> -->
+			<button type="button" class="add_new btn btn-primary " data-toggle="modal" data-target="#modal_dialog">
+					註冊
+			</button>
 		</div>
 	</div>
+
+	<div id="modal_dialog" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modal_dialogLabel" aria-hidden="true" style="display: none;">
+			<div class="modal-dialog" role="document">
+			  <div class="modal-content">
+				<div class="modal-header">
+				  <h5 class="modal-title" id="modal_dialogLabel">註冊一位新助理</h5>
+				  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">×</span>
+				  </button>
+				</div>
+				<div class="modal-body">
+						<form class="bd-example">
+								<fieldset>
+								  <legend></legend>
+					 
+								  <p class="row">
+									  <label class="col-5" for="input_assistant">姓名</label>
+									  <input class="col-6" type="text" id="input_assistant" placeholder="ex: 王大名">
+								  </p>
+								  <p class="row">
+										<label class="col-5" for="input_email">帳號 （電子信箱）</label>
+										<input class="col-6" type="email" id="input_email" placeholder="ex: alice@gmail.com">
+									</p>
+								  <p class="row">
+										<label class="col-5" for="input_password">密碼</label>
+										<input class="col-6" type="password" id="input_password" placeholder="ex: ******">
+								  </p>
+								  <p class="row">
+										<label class="col-5" for="input_password_re">密碼(請再輸入一次)</label>
+										<input class="col-6" type="password" id="input_password_re" placeholder="ex: ******">
+								  </p>
+								  <p class="row">
+									  <label class="col-5" for="input_phone">市內電話</label>
+									  <input class="col-6" type="text" id="input_phone" placeholder="ex: 021234567">
+								  </p>
+								  <p class="row"> 
+									  <label class="col-5" for="input_cellphone">手機號碼</label>
+									  <input class="col-6" type="text" id="input_cellphone" placeholder="ex: 0912345678">
+								  </p>
+								  
+								  <p class="row">
+									<label class="col-5" for="join_date">工作第一天</label>
+									<input class="col-6" type="date" id="join_date">
+								  </p>
+								  <p class="row">
+										<label class="col-5" for="input_salary">時薪</label>
+										<input class="col-6" type="text" id="input_salary" placeholder="700">
+								 </p>
+								 <p class="row">
+										<label class="col-5" for="textarea_note">備註</label>
+										<textarea class="col-6" id="textarea_note" rows="3"></textarea>
+								</p>
+								</fieldset>
+							  </form>
+				</div>
+				<div class="modal-footer">
+				  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				  <button type="button" class="btn btn-primary save_assistant">Save</button>
+				</div>
+			  </div>
+			</div>
+		</div>
 </body>
 
 <script>

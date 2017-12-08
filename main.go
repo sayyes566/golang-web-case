@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/kataras/iris"
@@ -8,10 +9,13 @@ import (
 )
 
 type page struct {
-	PTitle     string
-	Javascript string
-	Something  string
-	SomeNumber string
+	PTitle      string
+	Permission  string
+	User        string
+	To_user_msg string
+	Javascript  string
+	Something   string
+	SomeNumber  string
 }
 
 type page_classes struct {
@@ -150,6 +154,7 @@ func main() {
 	app.Put("/post_notice_edit", post_account_handler)   //edit
 	app.Put("/post_notice_remove", post_account_handler) //remove
 
+	app.Post("/login_check", post_login_Handler)
 	app.Get("/login", func(ctx iris.Context) {
 
 		ctx.ViewLayout(iris.NoLayout)
@@ -160,6 +165,7 @@ func main() {
 		}
 
 	})
+
 	// app.Get("/logout", func(ctx iris.Context) {
 	// 	// removes all entries
 	// 	sess.Start(ctx).Clear()
@@ -168,9 +174,10 @@ func main() {
 
 	app.Get("/", func(ctx iris.Context) {
 		session := sess.Start(ctx)
-		session.Set("key", "value")
-
-		ctx.ViewData("", page{PTitle: "HOME-Victory"})
+		name := session.GetString("name")
+		permission := session.GetString("permission")
+		fmt.Println("name:" + name)
+		ctx.ViewData("", page{PTitle: "HOME-Victory", Permission: permission, User: name, To_user_msg: to_user_msg(permission)})
 		if err := ctx.View("page_index.html"); err != nil {
 			ctx.StatusCode(iris.StatusInternalServerError)
 			ctx.Writef(err.Error())

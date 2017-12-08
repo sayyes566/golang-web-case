@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"strings"
 
 	"github.com/fatih/structs"
@@ -326,9 +327,48 @@ func powerPost(ctx iris.Context) {
 
 	}
 }
+
+func post_login_Handler(ctx iris.Context) {
+	c := &Person{}
+
+	if err := ctx.ReadJSON(c); err != nil {
+		ctx.StatusCode(iris.StatusBadRequest)
+		ctx.WriteString(err.Error())
+		ctx.Writef("fail")
+	}
+	fmt.Println("reflect")
+	fmt.Println(reflect.TypeOf(c.Name))
+	fmt.Println(c.Name)
+	fmt.Println(c.Password)
+	p := login_find(c.Name, c.Password)
+
+	fmt.Println(p)
+	if p.Name != "" && p.EMAIL != "" {
+		session := sess.Start(ctx)
+		//permission  := ""
+		if p.Identity == "Assistant" {
+			session.Set("permission", "助理")
+		} else if p.Identity == "Manager" {
+			session.Set("permission", "管理員")
+		} else {
+			session.Set("permission", "")
+		}
+		//permission = "管理員"
+
+		// session.Set("permission", permission)
+		session.Set("name", p.Name)
+		fmt.Println("=======post_login_Handler")
+		ctx.Writef("{}")
+	} else {
+		ctx.Writef("error")
+	}
+
+}
 func postHandler(ctx iris.Context) {
 
 	page_now := ctx.Path()
+	fmt.Println("page_now")
+	fmt.Println(page_now)
 	c := &Person{}
 	c_multi := []Person{}
 
@@ -338,28 +378,35 @@ func postHandler(ctx iris.Context) {
 	case "/post_data_student", "/post_data_student_edit":
 		c = &Person{}
 		identity = "Student"
+		break
 	case "/post_data_student_remove":
 		c_multi = []Person{}
 		identity = "Student"
+		break
 	case "/post_data_teacher", "/post_data_teacher_edit":
 		c = &Person{}
 		identity = "Teacher"
+		break
 	case "/post_data_teacher_remove":
 		c_multi = []Person{}
 		identity = "Teacher"
-	case "/post_data_assistant", "/post_data_assistant_edit":
+		break
+	case "/login", "/post_data_assistant", "/post_data_assistant_edit":
 		c = &Person{}
 		identity = "Assistant"
+		fmt.Println("####")
+		break
 	case "/post_data_assistant_remove":
 		c_multi = []Person{}
 		identity = "Assistant"
-
+		break
 	// case "/post_data_class", "/post_data_class_edit":
 	// 	c = &Class{}
 	// case "/post_data_class_remove":
 	// 	c_multi = []Class{}
 	default:
 		ctx.Writef("fail")
+		break
 	}
 
 	//c := &Person{}
@@ -389,11 +436,13 @@ func postHandler(ctx iris.Context) {
 	} else if strings.Contains(page_now, "remove") {
 		res = person_remove(c_multi, identity)
 	} else if strings.Contains(page_now, "data") {
+		fmt.Println("$$$")
+		fmt.Println(c)
 		res = person_insert(*c, identity)
 	} else {
 		ctx.Writef("fail")
 	}
-
+	fmt.Println("@@@@")
 	fmt.Println(page_now)
 	if res != "success" {
 		ctx.Writef(string("{ \"error\": \"" + res + "\" }"))

@@ -43,6 +43,30 @@ var number_date_formate = function(day){
     }
 }
 
+
+// var save_todo = function(string_json_data, url, http_type,  callback){
+//     $.ajax({
+//         type: http_type,
+//         url: url,
+//         dataType: "Json",
+//         data: string_json_data,
+//         success: function(result){
+//             console.log("=  save 1===")
+//             console.log(result)
+//             let str_res = result.toString()
+//             console.log("=  save 2===")
+//             console.log(str_res)
+//             if(str_res.split("warn").length < 2 && str_res.split("error").length < 2)
+//                 return callback()
+//         },error: function(err){
+//             console.log("=  error 1===")
+//             console.log(err)
+//         }
+        
+//     })
+// }
+
+
 $(".date_now").ready(function(){
     $(".date_now").html(now_date());
 })
